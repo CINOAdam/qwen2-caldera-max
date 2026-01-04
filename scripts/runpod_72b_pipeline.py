@@ -116,6 +116,7 @@ def phase_eval(config_name: str):
         "--model-id", MODEL_ID,
         "--caldera-dir", caldera_dir,
         "--samples", "256",
+        "--device-map", "auto",
     ])
 
     # MMLU evaluation (subset)
@@ -144,6 +145,7 @@ def phase_baseline():
         "python", "scripts/eval.py",
         "--model-id", MODEL_ID,
         "--samples", "256",
+        "--device-map", "auto",
     ])
 
     # MMLU
