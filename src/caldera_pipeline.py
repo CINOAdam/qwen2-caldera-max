@@ -149,11 +149,23 @@ def _collect_inputs(
 
     handle = module.register_forward_hook(hook)
     model.eval()
+
+    # Detect input device for sharded models
+    if hasattr(model, 'hf_device_map') and model.hf_device_map:
+        # Model is sharded - find the input device (usually the embed_tokens device)
+        first_device = next(iter(model.hf_device_map.values()))
+        if isinstance(first_device, int):
+            input_device = torch.device(f"cuda:{first_device}")
+        else:
+            input_device = torch.device(first_device)
+    else:
+        input_device = device
+
     with torch.no_grad():
         for batch in dataloader:
             if total >= max_samples:
                 break
-            input_ids, attention_mask = (item.to(device) for item in batch)
+            input_ids, attention_mask = (item.to(input_device) for item in batch)
             _ = model(input_ids=input_ids, attention_mask=attention_mask)
     handle.remove()
 
@@ -227,6 +239,7 @@ def compress_model(config: dict) -> None:
 
     runtime_cfg = config.get("runtime", {})
     dtype = _resolve_dtype(runtime_cfg.get("dtype", "bf16"))
+    device_map = runtime_cfg.get("device_map", None)
     device = torch.device(runtime_cfg.get("device", "cuda"))
 
     model_id = config["model_id"]
@@ -235,12 +248,21 @@ def compress_model(config: dict) -> None:
     batch_size = int(config.get("caldera", {}).get("calibration_batch_size", 1))
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
 
-    model = AutoModelForCausalLM.from_pretrained(
-        model_id,
-        torch_dtype=dtype,
-        device_map=None,
-    )
-    model.to(device)
+    if device_map:
+        # Multi-GPU loading
+        model = AutoModelForCausalLM.from_pretrained(
+            model_id,
+            torch_dtype=dtype,
+            device_map=device_map,
+        )
+    else:
+        # Single-GPU loading
+        model = AutoModelForCausalLM.from_pretrained(
+            model_id,
+            torch_dtype=dtype,
+            device_map=None,
+        )
+        model.to(device)
 
     caldera_cfg = config["caldera"]
     compute_device = torch.device(caldera_cfg.get("compute_device", "cpu"))

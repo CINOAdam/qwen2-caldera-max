@@ -137,24 +137,42 @@ class CalderaLinear(nn.Module):
 
         return q, l, r
 
+    def _maybe_dequant_r(self, dtype: torch.dtype, device: torch.device) -> torch.Tensor:
+        if (
+            self.cache_dequant
+            and self._r_deq is not None
+            and self._r_deq.dtype == dtype
+            and self._r_deq.device == device
+        ):
+            return self._r_deq
+
+        r_vals = self._unpack_values(self.r_values, self.r_pack_bits, self.r_packed_cols)
+        r = dequantize_groupwise(
+            QuantizedTensor(r_vals, self.r_scales, self.group_size, 0)
+        )
+        if r.dtype != dtype or r.device != device:
+            r = r.to(device=device, dtype=dtype)
+
+        if self.cache_dequant:
+            self._r_deq = r
+
+        return r
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         dtype = x.dtype
         device = x.device
         original_shape = x.shape
         x = x.reshape(-1, original_shape[-1])
 
-        r_vals = self._unpack_values(self.r_values, self.r_pack_bits, self.r_packed_cols)
-        r = dequantize_groupwise(
-            QuantizedTensor(r_vals, self.r_scales, self.group_size, 0)
-        ).to(device=device, dtype=dtype)
-        xr = x @ r.t()
-
         if self.chunk_size is None or self.chunk_size >= self.out_features:
-            q, l, _ = self._maybe_dequant(dtype, device)
+            q, l, r = self._maybe_dequant(dtype, device)
+            xr = x @ r.t()
             base = x @ q.t()
             low_rank = xr @ l.t()
             out = base + low_rank
         else:
+            r = self._maybe_dequant_r(dtype, device)
+            xr = x @ r.t()
             outputs = []
             for start in range(0, self.out_features, self.chunk_size):
                 end = min(start + self.chunk_size, self.out_features)

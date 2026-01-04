@@ -227,3 +227,6 @@ PYTHONPATH=. python scripts/mixkvq_generate.py \
 - 2026-01-03: Reverted tile_size to 128 and re-ran the large mojo_cached sweep:
   4096 avg_time_s=1.58e-02 (~2.26 GFLOPs) and 8192 avg_time_s=6.30e-02 (~2.27 GFLOPs),
   tagged `sweep-large-v4` in `artifacts/kernel_bench.csv`.
+- 2026-01-03: Optimized `CalderaLinear` to reuse cached R dequantization and avoid
+  double-dequant in the non-chunk path; added a small smoke test. This reduces
+  per-step overhead when `cache_dequant=True`.

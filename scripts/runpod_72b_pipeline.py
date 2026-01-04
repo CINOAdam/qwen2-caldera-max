@@ -59,6 +59,7 @@ def phase_fidelity():
         "python", "scripts/layer_fidelity.py",
         "--model-id", MODEL_ID,
         "--samples", "64",
+        "--device-map", "auto",
         "--output", str(output_path),
     ])
 

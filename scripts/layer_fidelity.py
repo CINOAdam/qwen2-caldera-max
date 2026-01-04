@@ -196,6 +196,7 @@ def main() -> None:
     parser.add_argument("--samples-per-seq", type=int, default=8, help="Token positions per sample.")
     parser.add_argument("--negatives", type=int, default=2048, help="Negative tokens per position.")
     parser.add_argument("--device", default="cuda", help="Device for evaluation.")
+    parser.add_argument("--device-map", default=None, help="Device map (auto for multi-GPU).")
     parser.add_argument("--dtype", default="bf16", help="Model dtype.")
     parser.add_argument("--cache-dequant", action="store_true", help="Cache dequantized weights.")
     parser.add_argument("--chunk-size", type=int, default=1024, help="Output chunk size.")
@@ -243,11 +244,25 @@ def main() -> None:
     else:
         from transformers import AutoModelForCausalLM
 
-        model = AutoModelForCausalLM.from_pretrained(
-            args.model_id,
-            torch_dtype=dtype,
-            device_map=None,
-        ).to(device)
+        if args.device_map:
+            model = AutoModelForCausalLM.from_pretrained(
+                args.model_id,
+                torch_dtype=dtype,
+                device_map=args.device_map,
+            )
+            # Override device for sharded models
+            if hasattr(model, 'hf_device_map') and model.hf_device_map:
+                first_device = next(iter(model.hf_device_map.values()))
+                if isinstance(first_device, int):
+                    device = torch.device(f"cuda:{first_device}")
+                else:
+                    device = torch.device(first_device)
+        else:
+            model = AutoModelForCausalLM.from_pretrained(
+                args.model_id,
+                torch_dtype=dtype,
+                device_map=None,
+            ).to(device)
 
     model.eval()
     if hasattr(model, "config") and hasattr(model.config, "use_cache"):

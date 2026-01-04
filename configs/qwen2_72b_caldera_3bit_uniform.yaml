@@ -39,3 +39,4 @@ caldera:
 runtime:
   dtype: bf16
   device: cuda
+  device_map: auto
