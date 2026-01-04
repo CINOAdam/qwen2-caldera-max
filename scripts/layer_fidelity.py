@@ -164,7 +164,10 @@ class _LayerCollector:
             return
         if isinstance(hidden, (tuple, list)):
             hidden = hidden[0]
-        selected = hidden[self.pair_batch, self.pair_pos].detach().cpu()
+        # Move indices to the same device as hidden (handles sharded models)
+        pair_batch = self.pair_batch.to(hidden.device)
+        pair_pos = self.pair_pos.to(hidden.device)
+        selected = hidden[pair_batch, pair_pos].detach().cpu()
         correct, margin, total = _sampled_fidelity(
             selected,
             self.target_ids,
