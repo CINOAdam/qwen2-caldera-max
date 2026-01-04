@@ -230,3 +230,6 @@ PYTHONPATH=. python scripts/mixkvq_generate.py \
 - 2026-01-03: Optimized `CalderaLinear` to reuse cached R dequantization and avoid
   double-dequant in the non-chunk path; added a small smoke test. This reduces
   per-step overhead when `cache_dequant=True`.
+- 2026-01-04: Started 72B compression on RunPod (2x A100 80GB). Baseline results:
+  PPL=8.6955, MMLU=73.3% (abstract_algebra 74%, high_school_math 62%, computer_security 84%).
+  3bit-uniform compression in progress. Fidelity queued to run after compression.
