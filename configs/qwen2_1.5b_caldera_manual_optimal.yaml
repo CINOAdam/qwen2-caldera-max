@@ -1,0 +1,78 @@
+# Phase 0 validation: Manual "optimal" allocation for Qwen2-1.5B
+# Higher rank for high-sensitivity layers (later layers based on fidelity)
+# Lower rank for low-sensitivity layers (early layers)
+#
+# Memory budget: Same average rank as uniform (64)
+# Strategy:
+#   - Layers 0-9 (early):  rank=48 (10 layers × 48 = 480)
+#   - Layers 10-17 (mid):  rank=64 (8 layers × 64 = 512)
+#   - Layers 18-27 (late): rank=80 (10 layers × 80 = 800)
+#   Total: 1792 / 28 layers = 64 average (same as uniform)
+
+model_id: Qwen/Qwen2-1.5B-Instruct
+output_dir: artifacts/qwen2-1.5b/caldera-manual-optimal
+
+calibration:
+  datasets:
+    - name: c4
+      weight: 1.0
+  samples: 512
+  sequence_length: 512
+  progress_every: 100
+
+caldera:
+  # Base config (4-bit working settings)
+  bq: 4       # 4-bit Q (working config)
+  bl: 8       # 8-bit L factor
+  br: 8       # 8-bit R factor
+  rank: 64   # Default for mid layers
+  group_size: 128
+  calibration_batch_size: 1
+  calibration_samples: 512
+  use_calibration: false  # Disabled due to calibration bug
+  ridge_lambda: 0.0001
+  compute_device: cuda
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+  # Per-layer overrides (rank only - same bq for all)
+  pattern_overrides:
+    # Early layers (0-9): Lower rank - less sensitive
+    "model.layers.0.*": {rank: 48}
+    "model.layers.1.*": {rank: 48}
+    "model.layers.2.*": {rank: 48}
+    "model.layers.3.*": {rank: 48}
+    "model.layers.4.*": {rank: 48}
+    "model.layers.5.*": {rank: 48}
+    "model.layers.6.*": {rank: 48}
+    "model.layers.7.*": {rank: 48}
+    "model.layers.8.*": {rank: 48}
+    "model.layers.9.*": {rank: 48}
+
+    # Mid layers (10-17): Baseline rank
+    # (uses default rank=64)
+
+    # Late layers (18-27): Higher rank - more sensitive
+    "model.layers.18.*": {rank: 80}
+    "model.layers.19.*": {rank: 80}
+    "model.layers.20.*": {rank: 80}
+    "model.layers.21.*": {rank: 80}
+    "model.layers.22.*": {rank: 80}
+    "model.layers.23.*": {rank: 80}
+    "model.layers.24.*": {rank: 80}
+    "model.layers.25.*": {rank: 80}
+    "model.layers.26.*": {rank: 80}
+    "model.layers.27.*": {rank: 80}
+
+  use_rht: false
+  lora_finetune: false
+
+runtime:
+  dtype: bf16
+  device: cuda

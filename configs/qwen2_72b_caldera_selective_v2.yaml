@@ -1,0 +1,51 @@
+model_id: Qwen/Qwen2-72B-Instruct
+output_dir: artifacts/qwen2-72b/caldera-selective-v2
+
+calibration:
+  datasets:
+    - name: c4
+      weight: 0.7
+    - name: sharegpt
+      weight: 0.3
+  samples: 4096
+  sequence_length: 2048
+  progress_every: 200
+
+caldera:
+  bq: 4
+  bl: 4
+  br: 4
+  rank: 256
+  group_size: 128
+  calibration_batch_size: 1
+  calibration_samples: 2048
+  use_calibration: true
+  ridge_lambda: 0.0001
+  compute_device: cpu
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+  pattern_overrides:
+    "model.layers.47.*": {rank: 512, bq: 8, bl: 8}
+    "model.layers.36.*": {rank: 512, bq: 8, bl: 8}
+    "model.layers.31.*": {rank: 512, bq: 8, bl: 8}
+    "model.layers.41.*": {rank: 512, bq: 8, bl: 8}
+    "model.layers.52.*": {rank: 384, bq: 6, bl: 6}
+    "model.layers.48.*": {rank: 384, bq: 6, bl: 6}
+    "model.layers.27.*": {rank: 384, bq: 6, bl: 6}
+    "model.layers.58.*": {rank: 384, bq: 6, bl: 6}
+    "model.layers.43.*": {rank: 384, bq: 6, bl: 6}
+    "model.layers.32.*": {rank: 384, bq: 6, bl: 6}
+    "model.layers.39.*": {rank: 384, bq: 6, bl: 6}
+    "model.layers.61.*": {rank: 384, bq: 6, bl: 6}
+  use_rht: true
+  lora_finetune: false
+
+runtime:
+  dtype: bf16
+  device: cuda

@@ -1,0 +1,40 @@
+# 4-bit uniform compression for Qwen2-72B
+# Higher fidelity baseline - fallback if 3-bit degrades too much
+
+model_id: Qwen/Qwen2-72B-Instruct
+output_dir: artifacts/qwen2-72b/caldera-4bit-uniform
+
+calibration:
+  datasets:
+    - name: c4
+      weight: 1.0
+  samples: 512
+  sequence_length: 512
+  progress_every: 100
+
+caldera:
+  bq: 4
+  bl: 4
+  br: 4
+  rank: 64
+  group_size: 128
+  calibration_batch_size: 1
+  calibration_samples: 512
+  use_calibration: false
+  ridge_lambda: 1.0
+  compute_device: cuda
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+  use_rht: false
+  lora_finetune: false
+
+runtime:
+  dtype: bf16
+  device: cuda

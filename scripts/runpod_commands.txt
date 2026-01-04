@@ -1,0 +1,30 @@
+# Run these commands on the RunPod instance
+
+# 1. Clone repo
+cd /workspace
+git clone https://github.com/your-username/qwen2-caldera-max.git
+cd qwen2-caldera-max
+
+# 2. Install dependencies
+pip install -e .
+pip install pyyaml datasets transformers accelerate safetensors tqdm
+
+# 3. Login to HuggingFace (for Qwen2-72B access)
+huggingface-cli login
+
+# 4. Create directories
+mkdir -p artifacts/qwen2-72b logs
+
+# 5. Run full pipeline (takes ~20 hours)
+PYTHONPATH=. nohup python scripts/runpod_72b_pipeline.py --phase all > logs/pipeline.log 2>&1 &
+
+# 6. Monitor progress
+tail -f logs/pipeline.log
+
+# OR run step by step:
+# PYTHONPATH=. python scripts/runpod_72b_pipeline.py --phase baseline
+# PYTHONPATH=. python scripts/runpod_72b_pipeline.py --phase fidelity
+# PYTHONPATH=. python scripts/runpod_72b_pipeline.py --phase compress --config 3bit-uniform
+# PYTHONPATH=. python scripts/runpod_72b_pipeline.py --phase compress --config 3bit-ultra
+# PYTHONPATH=. python scripts/runpod_72b_pipeline.py --phase eval --config 3bit-uniform
+# PYTHONPATH=. python scripts/runpod_72b_pipeline.py --phase eval --config 3bit-ultra

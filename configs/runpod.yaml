@@ -1,0 +1,42 @@
+name: qwen2-caldera-qwen2-72b
+cloud_type: COMMUNITY
+compute_type: GPU
+interruptible: false
+
+gpu_type_priority: custom
+gpu_type_ids:
+  - NVIDIA B200
+  - NVIDIA H200
+  - NVIDIA H100 80GB HBM3
+  - NVIDIA H100 NVL
+  - NVIDIA H100 PCIe
+  - NVIDIA A100-SXM4-80GB
+  - NVIDIA A100 80GB PCIe
+
+gpu_count: 1
+min_vcpu_per_gpu: 8
+min_ram_per_gpu: 64
+support_public_ip: true
+
+image_name: runpod/pytorch:1.0.3-cu1290-torch291-ubuntu2204
+
+volume_in_gb: 200
+container_disk_in_gb: 200
+volume_mount_path: /workspace
+
+ports:
+  - 22/tcp
+  - 8888/http
+
+env:
+  HF_TOKEN: ${HF_TOKEN}
+  PUBLIC_KEY: ${PUBLIC_KEY}
+
+docker_start_cmd:
+  - /bin/bash
+  - -lc
+  - >-
+      mkdir -p /root/.ssh &&
+      echo c3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBREFRQUJBQUFDQVFDdDB1TmJSSHNZRU9kcXlwWHpIVG1kR3FLa0l3d2RXczVBdlU2V0JUZHVhU0hJd1VGRWtOZWk0TkwrdHA4TFd6TU9zM2Q4N0haTlZJbW1rNzRaQjZIRDFHdm5DWFozVFEwQmliMktOT1c5NCtkcnNaUzA1N0ZDc1pDSXVzejdjSlUyNWU2TTliZndlVXZlblJtUW9VeHNuamV1QmdBaFA1SkJxbUlFQWdJYkllWWZNUTNKb1h4ZkVxSWwrdmZwNDhRWitWSnlvdnJlWXE3WUZtZjFPYjJJOS81ekdoVEtWTjE1b1BrTU1KcWltVytYUS81a3pJalJmODNKL3hDRDhVMk5GVG5RNm1aVDRjVnhFSERncUZqZk9RTlVRaExTVFA0NkQ2Zjd3SnNRR01XZ055MXo3N2NsSE5xUzBVZVpPSk5XQnZZZkNFNnplTmNQZ0x4R0FhcysvTGJwNTdMWXZweW1BRWhpVUk5MkpaU2JwTFlKeHl1eUFQeGs0eGtaWHVnL0daV2l4RkE5dDZSZHh4b0J3SEIrWlpRYnFuUEZ2L2hXdXNab0RyVnVNZklBSzYxUGZNY3NieGpoZHVsVEpVb29nNGxKbitDTnNWcC9UN2lFbStWRnRqN0ovb2xIZElRc28vYitqQ3lKOHR6dnRsRWF0Qm5KUnYzNHhNUjhSekQ4MGtmR2lFdGdwbDJjZ3ZmQ0RDelFwa2tYTlpGS3htTDhnKzJNSytxdVZwa2lienVBenh3WVJGNWdTU21oeU9uRytSL2t4eHB6Ry9BdzgxK1dXNGlIbmJrVG45UHZKM0JUdTlTNzF3T0E1Y2pQaTdWckVoOURRUmhNZE1tQTNtYjFGNFhUcGY2UnJTNk0yWnJoNzlsTjFydUE1bmVSMzN1VjhsRjZQZjZ0eVE9PSBhZGFtQGltZWdvbmxpbmUuY29tCg== | base64 -d >> /root/.ssh/authorized_keys &&
+      chmod 700 -R /root/.ssh &&
+      exec /start.sh

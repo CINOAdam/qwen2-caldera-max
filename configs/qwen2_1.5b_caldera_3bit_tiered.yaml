@@ -1,0 +1,59 @@
+# 3-bit with 3-tier fidelity-based allocation
+# Tier 1 (critical, fidelity>0.15): layers 0,1,25,27 -> rank=128
+# Tier 2 (high, 0.11-0.15): layers 2-4,22-24,26 -> rank=72
+# Tier 3 (low, <0.11): layers 5-21 -> rank=44
+# Budget: 4*128 + 8*72 + 16*44 = 512 + 576 + 704 = 1792 = 28*64 (same as uniform)
+
+model_id: Qwen/Qwen2-1.5B-Instruct
+output_dir: artifacts/qwen2-1.5b/caldera-3bit-tiered
+
+calibration:
+  datasets:
+    - name: c4
+      weight: 1.0
+  samples: 512
+  sequence_length: 512
+  progress_every: 100
+
+caldera:
+  bq: 3
+  bl: 4
+  br: 4
+  rank: 44   # Default for low-fidelity layers (tier 3)
+  group_size: 128
+  calibration_batch_size: 1
+  calibration_samples: 512
+  use_calibration: false
+  ridge_lambda: 1.0
+  compute_device: cuda
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+  pattern_overrides:
+    # Tier 1: Critical layers (fidelity > 0.15)
+    "model.layers.0.*": {rank: 128}   # fidelity 0.199
+    "model.layers.1.*": {rank: 128}   # fidelity 0.166
+    "model.layers.25.*": {rank: 128}  # fidelity 0.164
+    "model.layers.27.*": {rank: 128}  # fidelity 0.308
+
+    # Tier 2: High sensitivity (0.11-0.15)
+    "model.layers.2.*": {rank: 72}    # fidelity 0.114
+    "model.layers.3.*": {rank: 72}    # fidelity 0.128
+    "model.layers.4.*": {rank: 72}    # fidelity 0.123
+    "model.layers.22.*": {rank: 72}   # fidelity 0.142
+    "model.layers.23.*": {rank: 72}   # fidelity 0.140
+    "model.layers.24.*": {rank: 72}   # fidelity 0.142
+    "model.layers.26.*": {rank: 72}   # fidelity 0.140
+
+  use_rht: false
+  lora_finetune: false
+
+runtime:
+  dtype: bf16
+  device: cuda

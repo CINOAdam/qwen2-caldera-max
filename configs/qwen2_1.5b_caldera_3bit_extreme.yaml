@@ -1,0 +1,50 @@
+# 3-bit compression with extreme fidelity-guided allocation
+# Top 5 most sensitive (0, 1, 25, 27, 22): rank=128
+# Rest: rank=32
+# Budget: 5*128 + 23*32 = 1376 / 28 = 49.1 (lower budget, but tests hypothesis)
+
+model_id: Qwen/Qwen2-1.5B-Instruct
+output_dir: artifacts/qwen2-1.5b/caldera-3bit-extreme
+
+calibration:
+  datasets:
+    - name: c4
+      weight: 1.0
+  samples: 512
+  sequence_length: 512
+  progress_every: 100
+
+caldera:
+  bq: 3
+  bl: 4
+  br: 4
+  rank: 32   # Default for less sensitive layers
+  group_size: 128
+  calibration_batch_size: 1
+  calibration_samples: 512
+  use_calibration: false
+  ridge_lambda: 1.0
+  compute_device: cuda
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+  # Top 5 most sensitive layers (from fidelity data)
+  pattern_overrides:
+    "model.layers.0.*": {rank: 128}   # fidelity 0.199 (1.66x)
+    "model.layers.1.*": {rank: 128}   # fidelity 0.166 (1.38x)
+    "model.layers.25.*": {rank: 128}  # fidelity 0.164 (1.36x)
+    "model.layers.27.*": {rank: 128}  # fidelity 0.308 (2.57x)
+    "model.layers.22.*": {rank: 128}  # fidelity 0.142 (1.18x)
+
+  use_rht: false
+  lora_finetune: false
+
+runtime:
+  dtype: bf16
+  device: cuda

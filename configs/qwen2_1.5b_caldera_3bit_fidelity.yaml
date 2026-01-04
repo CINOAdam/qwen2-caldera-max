@@ -1,0 +1,59 @@
+# 3-bit compression with fidelity-guided allocation
+# Based on layer_fidelity.json:
+#   High fidelity (>1.0x mean): layers 0-1, 3-4, 22-27 -> rank=80
+#   Low fidelity: layers 2, 5-21 -> rank=48
+# Average rank: (12*80 + 16*48)/28 = 61.7 (slightly below 64)
+# Adjusting to keep budget: high layers=76, low layers=54 -> avg=64
+
+model_id: Qwen/Qwen2-1.5B-Instruct
+output_dir: artifacts/qwen2-1.5b/caldera-3bit-fidelity
+
+calibration:
+  datasets:
+    - name: c4
+      weight: 1.0
+  samples: 512
+  sequence_length: 512
+  progress_every: 100
+
+caldera:
+  bq: 3
+  bl: 4
+  br: 4
+  rank: 54   # Default for low-fidelity layers
+  group_size: 128
+  calibration_batch_size: 1
+  calibration_samples: 512
+  use_calibration: false
+  ridge_lambda: 1.0
+  compute_device: cuda
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+  # High-fidelity layers get more rank
+  pattern_overrides:
+    # Early sensitive layers
+    "model.layers.0.*": {rank: 76}
+    "model.layers.1.*": {rank: 76}
+    "model.layers.3.*": {rank: 76}
+    "model.layers.4.*": {rank: 76}
+    # Late sensitive layers
+    "model.layers.22.*": {rank: 76}
+    "model.layers.23.*": {rank: 76}
+    "model.layers.24.*": {rank: 76}
+    "model.layers.25.*": {rank: 76}
+    "model.layers.26.*": {rank: 76}
+    "model.layers.27.*": {rank: 76}
+
+  use_rht: false
+  lora_finetune: false
+
+runtime:
+  dtype: bf16
+  device: cuda

@@ -1,0 +1,48 @@
+# 4-bit with ultra-aggressive fidelity allocation for Qwen2-7B
+# Same allocation strategy as 3-bit ultra
+
+model_id: Qwen/Qwen2-7B-Instruct
+output_dir: artifacts/qwen2-7b/caldera-4bit-ultra
+
+calibration:
+  datasets:
+    - name: c4
+      weight: 1.0
+  samples: 512
+  sequence_length: 512
+  progress_every: 100
+
+caldera:
+  bq: 4
+  bl: 4
+  br: 4
+  rank: 32   # Default - minimal for robust early layers
+  group_size: 128
+  calibration_batch_size: 1
+  calibration_samples: 512
+  use_calibration: false
+  ridge_lambda: 1.0
+  compute_device: cuda
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+  pattern_overrides:
+    # CRITICAL: Final layers need protection
+    "model.layers.27.*": {rank: 256}
+    "model.layers.26.*": {rank: 256}
+    "model.layers.25.*": {rank: 128}
+    "model.layers.24.*": {rank: 128}
+    "model.layers.23.*": {rank: 80}
+
+  use_rht: false
+  lora_finetune: false
+
+runtime:
+  dtype: bf16
+  device: cuda

@@ -1,0 +1,51 @@
+# 3-bit with ultra-aggressive fidelity allocation
+# Top 2 layers get maximum protection, rest get minimum
+# Layer 27 (fidelity 0.308) and Layer 0 (fidelity 0.199) are outliers
+# Budget: 2*192 + 2*128 + 24*40 = 384 + 256 + 960 = 1600 (lower budget, extreme focus)
+
+model_id: Qwen/Qwen2-1.5B-Instruct
+output_dir: artifacts/qwen2-1.5b/caldera-3bit-ultra
+
+calibration:
+  datasets:
+    - name: c4
+      weight: 1.0
+  samples: 512
+  sequence_length: 512
+  progress_every: 100
+
+caldera:
+  bq: 3
+  bl: 4
+  br: 4
+  rank: 40   # Default - minimal for robust layers
+  group_size: 128
+  calibration_batch_size: 1
+  calibration_samples: 512
+  use_calibration: false
+  ridge_lambda: 1.0
+  compute_device: cuda
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+  pattern_overrides:
+    # Ultra-critical: Layer 27 is 2.5x more sensitive than average
+    "model.layers.27.*": {rank: 256}  # fidelity 0.308 (outlier!)
+    "model.layers.0.*": {rank: 256}   # fidelity 0.199 (2nd highest)
+
+    # Very high sensitivity
+    "model.layers.1.*": {rank: 128}   # fidelity 0.166
+    "model.layers.25.*": {rank: 128}  # fidelity 0.164
+
+  use_rht: false
+  lora_finetune: false
+
+runtime:
+  dtype: bf16
+  device: cuda

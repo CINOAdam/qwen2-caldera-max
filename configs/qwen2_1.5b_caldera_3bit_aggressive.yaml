@@ -1,0 +1,55 @@
+# 3-bit compression with aggressive fidelity-guided allocation
+# More extreme rank difference: 96 for sensitive, 40 for robust
+# 10 high-fidelity layers * 96 + 18 low-fidelity layers * 40 = 1680 / 28 = 60 avg
+# Bump slightly: 10 * 100 + 18 * 42 = 1756 / 28 = 62.7
+
+model_id: Qwen/Qwen2-1.5B-Instruct
+output_dir: artifacts/qwen2-1.5b/caldera-3bit-aggressive
+
+calibration:
+  datasets:
+    - name: c4
+      weight: 1.0
+  samples: 512
+  sequence_length: 512
+  progress_every: 100
+
+caldera:
+  bq: 3
+  bl: 4
+  br: 4
+  rank: 42   # Default for low-fidelity layers
+  group_size: 128
+  calibration_batch_size: 1
+  calibration_samples: 512
+  use_calibration: false
+  ridge_lambda: 1.0
+  compute_device: cuda
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+  # High-fidelity layers get much more rank
+  pattern_overrides:
+    "model.layers.0.*": {rank: 100}
+    "model.layers.1.*": {rank: 100}
+    "model.layers.3.*": {rank: 100}
+    "model.layers.4.*": {rank: 100}
+    "model.layers.22.*": {rank: 100}
+    "model.layers.23.*": {rank: 100}
+    "model.layers.24.*": {rank: 100}
+    "model.layers.25.*": {rank: 100}
+    "model.layers.26.*": {rank: 100}
+    "model.layers.27.*": {rank: 100}
+
+  use_rht: false
+  lora_finetune: false
+
+runtime:
+  dtype: bf16
+  device: cuda

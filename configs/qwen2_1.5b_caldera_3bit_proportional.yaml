@@ -1,0 +1,74 @@
+# 3-bit with rank proportional to fidelity
+# Formula: rank = round(base * fidelity / mean_fidelity)
+# Mean fidelity = 0.12, base_rank = 64
+# Scaled to maintain budget = 28 * 64 = 1792
+
+model_id: Qwen/Qwen2-1.5B-Instruct
+output_dir: artifacts/qwen2-1.5b/caldera-3bit-proportional
+
+calibration:
+  datasets:
+    - name: c4
+      weight: 1.0
+  samples: 512
+  sequence_length: 512
+  progress_every: 100
+
+caldera:
+  bq: 3
+  bl: 4
+  br: 4
+  rank: 48   # Fallback (not used, all layers have overrides)
+  group_size: 128
+  calibration_batch_size: 1
+  calibration_samples: 512
+  use_calibration: false
+  ridge_lambda: 1.0
+  compute_device: cuda
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+  # Ranks proportional to fidelity (scaled to avg=64)
+  # fidelity * 533 (scaling factor to get mean ~64)
+  pattern_overrides:
+    "model.layers.0.*": {rank: 106}   # 0.199 -> 106
+    "model.layers.1.*": {rank: 88}    # 0.166 -> 88
+    "model.layers.2.*": {rank: 60}    # 0.114 -> 60
+    "model.layers.3.*": {rank: 68}    # 0.128 -> 68
+    "model.layers.4.*": {rank: 66}    # 0.123 -> 66
+    "model.layers.5.*": {rank: 52}    # 0.097 -> 52
+    "model.layers.6.*": {rank: 44}    # 0.083 -> 44
+    "model.layers.7.*": {rank: 53}    # 0.100 -> 53
+    "model.layers.8.*": {rank: 47}    # 0.088 -> 47
+    "model.layers.9.*": {rank: 49}    # 0.092 -> 49
+    "model.layers.10.*": {rank: 40}   # 0.076 -> 40
+    "model.layers.11.*": {rank: 49}   # 0.092 -> 49
+    "model.layers.12.*": {rank: 54}   # 0.102 -> 54
+    "model.layers.13.*": {rank: 38}   # 0.071 -> 38
+    "model.layers.14.*": {rank: 39}   # 0.073 -> 39
+    "model.layers.15.*": {rank: 42}   # 0.078 -> 42
+    "model.layers.16.*": {rank: 54}   # 0.102 -> 54
+    "model.layers.17.*": {rank: 57}   # 0.107 -> 57
+    "model.layers.18.*": {rank: 54}   # 0.102 -> 54
+    "model.layers.19.*": {rank: 62}   # 0.116 -> 62
+    "model.layers.20.*": {rank: 53}   # 0.100 -> 53
+    "model.layers.21.*": {rank: 62}   # 0.116 -> 62
+    "model.layers.22.*": {rank: 76}   # 0.142 -> 76
+    "model.layers.23.*": {rank: 74}   # 0.140 -> 74
+    "model.layers.24.*": {rank: 76}   # 0.142 -> 76
+    "model.layers.25.*": {rank: 87}   # 0.164 -> 87
+    "model.layers.26.*": {rank: 74}   # 0.140 -> 74
+    "model.layers.27.*": {rank: 164}  # 0.308 -> 164
+
+  use_rht: false
+  lora_finetune: false
+
+runtime:
+  dtype: bf16
+  device: cuda

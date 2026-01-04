@@ -1,0 +1,37 @@
+model_id: Qwen/Qwen2-72B-Instruct
+output_dir: artifacts/qwen2-72b/caldera
+
+calibration:
+  datasets:
+    - name: c4
+      weight: 0.7
+    - name: sharegpt
+      weight: 0.3
+  samples: 4096
+  sequence_length: 2048
+
+caldera:
+  bq: 2
+  bl: 4
+  br: 4
+  rank: 128
+  group_size: 128
+  calibration_batch_size: 1
+  calibration_samples: 1024
+  use_calibration: true
+  ridge_lambda: 0.0001
+  compute_device: cpu
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+  use_rht: true
+  lora_finetune: false
+
+runtime:
+  dtype: bf16
+  device: cuda
