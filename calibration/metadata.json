@@ -1,0 +1,20 @@
+{
+  "source": "../data/consensus_cli_labels.jsonl",
+  "total_examples": 31578,
+  "splits": {
+    "high_conf": 8853,
+    "weighted": 31562,
+    "contested": 22725,
+    "balanced": 875
+  },
+  "model_reliability": {
+    "total_disagreements": 371,
+    "outlier_rates": {
+      "gpt5": 0.18059299191374664,
+      "claude": 0.29649595687331537,
+      "gemini": 0.49865229110512127,
+      "all_differ": 0.02425876010781671
+    }
+  },
+  "seed": 42
+}

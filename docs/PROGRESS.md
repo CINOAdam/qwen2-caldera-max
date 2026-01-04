@@ -215,3 +215,15 @@ PYTHONPATH=. python scripts/mixkvq_generate.py \
   segfaults. Drafted a bug report in `docs/BUG_REPORT_MAX_GPU_CUSTOM_OP.md`.
 - 2026-01-03: Filed GitHub issue for MAX GPU custom op segfault:
   https://github.com/modular/modular/issues/5737 (logs attached via secret gist).
+- 2026-01-03: Optimized Q/LR GPU kernels to iterate per-quant group (fewer scale
+  loads/divides) and verified parity (max_abs=1.79e-07). Quick mojo_cached bench
+  at 2048x2048x128 reports avg_time_s=6.14e-03 (~1.54 GFLOPs).
+- 2026-01-03: Re-ran large mojo_cached sweep after group-loop optimization:
+  4096 avg_time_s=1.46e-02 (~2.44 GFLOPs) and 8192 avg_time_s=6.12e-02 (~2.33 GFLOPs),
+  tagged `sweep-large-v2` in `artifacts/kernel_bench.csv`.
+- 2026-01-03: Tried tile_size=64 and re-ran the large mojo_cached sweep:
+  4096 avg_time_s=2.56e-02 (~1.39 GFLOPs) and 8192 avg_time_s=6.26e-02 (~2.28 GFLOPs),
+  tagged `sweep-large-v3` in `artifacts/kernel_bench.csv`.
+- 2026-01-03: Reverted tile_size to 128 and re-ran the large mojo_cached sweep:
+  4096 avg_time_s=1.58e-02 (~2.26 GFLOPs) and 8192 avg_time_s=6.30e-02 (~2.27 GFLOPs),
+  tagged `sweep-large-v4` in `artifacts/kernel_bench.csv`.

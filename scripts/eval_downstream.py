@@ -16,14 +16,13 @@ from src.caldera_loader import load_model_with_caldera
 from src.caldera_runtime import apply_caldera
 
 
-def load_compressed_model(model_id: str, caldera_dir: str, dtype: torch.dtype, device: str):
+def load_compressed_model(model_id: str, caldera_dir: str, dtype: torch.dtype, device_map: str = "auto"):
     """Load model with CALDERA compression applied."""
     model = AutoModelForCausalLM.from_pretrained(
         model_id,
         torch_dtype=dtype,
-        device_map=None,
+        device_map=device_map,
     )
-    model.to(device)
 
     caldera_path = Path(caldera_dir)
     if caldera_path.exists():
@@ -121,7 +120,7 @@ def main():
                         help="MMLU subjects to evaluate")
     parser.add_argument("--shots", type=int, default=5, help="Number of few-shot examples")
     parser.add_argument("--max-samples", type=int, default=50, help="Max samples per subject")
-    parser.add_argument("--device", default="cuda", help="Device")
+    parser.add_argument("--device-map", default="auto", help="Device map (auto for multi-GPU)")
     parser.add_argument("--dtype", default="bf16", help="Model dtype")
     parser.add_argument("--output", default=None, help="Output JSON file")
     args = parser.parse_args()
@@ -136,10 +135,10 @@ def main():
     # Load model
     if args.caldera_dir:
         print(f"Loading compressed model from {args.caldera_dir}")
-        model = load_compressed_model(args.model_id, args.caldera_dir, dtype, args.device)
+        model = load_compressed_model(args.model_id, args.caldera_dir, dtype, args.device_map)
     else:
         print(f"Loading base model {args.model_id}")
-        model = AutoModelForCausalLM.from_pretrained(args.model_id, torch_dtype=dtype, device_map=args.device)
+        model = AutoModelForCausalLM.from_pretrained(args.model_id, torch_dtype=dtype, device_map=args.device_map)
         model.eval()
 
     # Run evaluation

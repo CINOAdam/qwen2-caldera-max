@@ -129,6 +129,7 @@ def phase_eval(config_name: str):
         "--subjects", "abstract_algebra", "high_school_mathematics",
         "computer_security", "college_physics",
         "--max-samples", "50",
+        "--device-map", "auto",
         "--output", str(mmlu_output),
     ])
 
@@ -158,6 +159,7 @@ def phase_baseline():
         "--subjects", "abstract_algebra", "high_school_mathematics",
         "computer_security", "college_physics",
         "--max-samples", "50",
+        "--device-map", "auto",
         "--output", str(mmlu_output),
     ])
 

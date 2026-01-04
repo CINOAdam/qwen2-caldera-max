@@ -1,0 +1,25 @@
+# Local secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Artifacts and data
+artifacts/
+data/
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.gguf
+
+# Mojo/MAX build outputs
+*.o
+*.so
+*.a
+*.dSYM/
+
+# OS
+.DS_Store
