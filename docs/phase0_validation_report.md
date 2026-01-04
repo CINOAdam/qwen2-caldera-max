@@ -150,7 +150,45 @@ if pad:
 
 ---
 
-## 7. Next Steps
+## 7. 72B Validation Results (2025-01-04)
+
+Scaled validation to Qwen2-72B-Instruct on RunPod (2x A100 80GB).
+
+### 7.1 Perplexity (WikiText-2, 32 samples)
+
+| Model | PPL | Δ from Baseline | Δ from Uniform |
+|-------|-----|-----------------|----------------|
+| Baseline | 8.70 | - | - |
+| 3bit-uniform | 12.65 | +45.5% | - |
+| 3bit-ultra | 12.48 | +43.5% | **-1.3%** |
+
+### 7.2 MMLU (3-shot, 50 samples/subject)
+
+| Model | abstract_algebra | high_school_math | computer_security | **Overall** |
+|-------|-----------------|------------------|-------------------|-------------|
+| Baseline | 74% | 62% | 84% | **73.3%** |
+| 3bit-uniform | 64% | 54% | 84% | **67.3%** |
+| 3bit-ultra | 60% | 60% | 90% | **70.0%** |
+
+**Ultra vs Uniform**: +2.7 percentage points on MMLU
+
+### 7.3 72B Observations
+
+1. **PPL gains compress at scale**: 1.3% improvement vs 3.1% at 1.5B
+2. **Downstream benefits more**: +2.7pp MMLU vs +1.3% PPL suggests task quality matters more
+3. **Reasoning tasks benefit most**: computer_security jumped +6% (90% vs 84%)
+4. **U-shape sensitivity likely transfers**: Late layers (protected in ultra) drive reasoning
+
+### 7.4 Technical Achievement: Multi-GPU CALDERA
+
+Fixed multi-GPU CALDERA application for sharded models:
+- `hf_device_map` maps at layer level, not submodule level
+- Added `_get_device_for_module()` to walk up module path
+- Memory fix: Free original Linear weights before loading replacements
+
+---
+
+## 8. Next Steps
 
 ### Phase 1: Scale to 7B
 - Run fidelity measurement on Qwen2-7B

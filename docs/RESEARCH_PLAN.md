@@ -16,6 +16,20 @@ Define clear success criteria for:
 - How much throughput is lost by unfused Q + LR, and how much can a fused kernel recover?
 - Does CALDERA-style quantized low-rank outperform common PTQ baselines at similar bit budgets?
 
+## Direction from synthesis
+
+- Treat rank=128 and group_size=128 as the default baseline.
+- Compare cache modes explicitly (none vs R-only vs QLR) and select based on GPU results.
+- Implement a dual-path kernel: full fusion when it helps, staged Rx then Qx + Lrx when fusion regresses.
+- Use RTX 3090 benchmarks to decide the fusion cutoff (rank threshold / shape-dependent heuristic).
+- Expect MAX custom-op GPU integration risk; plan around fallbacks until device-pointer path is stable.
+
+## Initial fusion heuristic (to validate)
+
+- Start with fused when rank <= 128 and out_dim * in_dim >= 2048 * 2048 and batch * seq <= 128.
+- Fall back to staged when rank > 128 or for smaller shapes; allow manual override.
+- Re-tune thresholds after first GPU sweeps.
+
 ## Phases
 
 ### Phase 1: Baselines and scaffolding
@@ -35,8 +49,10 @@ Define clear success criteria for:
 ### Phase 3: Mojo/MAX kernel
 
 - Implement fused Q + LR inference kernel with on-the-fly dequant.
+- Add a staged fallback path (Rx then Qx + Lrx) and a simple heuristic to choose at runtime.
 - Compare fused vs unfused throughput at batch=1, seq=1 and seq=128.
 - Validate numerical parity vs unfused reference (define max/mean abs error targets).
+- Benchmark cache modes (none, R-only, QLR) to decide memory vs speed tradeoffs.
 
 ### Phase 4: Write-up
 
@@ -51,6 +67,7 @@ Define clear success criteria for:
 - Rank: 64, 128, 256
 - Calibration size: 1k, 4k, 8k sequences
 - Metrics: perplexity (C4/WikiText2), quick zero-shot tasks, throughput (tok/s)
+- Cache modes: none, r, qlr
 
 ## Risks
 
@@ -59,3 +76,4 @@ Define clear success criteria for:
 - Local runtime integration can delay kernel testing.
 - Dequant overhead and per-step KV expansion can dominate long-context latency.
 - Fused kernel may need a two-stage path (Rx then Qx+Lrx) if full fusion regresses.
+- MAX custom-op GPU support and device-pointer handling remain a reliability risk.

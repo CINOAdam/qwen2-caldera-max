@@ -58,13 +58,21 @@ class CalderaLinear(nn.Module):
         r_weight: QuantizedTensor,
         bias: torch.Tensor | None = None,
         cache_dequant: bool = False,
+        cache_mode: str | None = None,
         chunk_size: int | None = 1024,
     ) -> None:
         super().__init__()
         self.in_features = q_weight.values.shape[1]
         self.out_features = q_weight.values.shape[0]
         self.group_size = q_weight.group_size
-        self.cache_dequant = cache_dequant
+        if cache_mode is None:
+            cache_mode = "qlr" if cache_dequant else "none"
+        elif cache_dequant:
+            raise ValueError("Specify either cache_dequant or cache_mode, not both.")
+        if cache_mode not in {"none", "r", "lr", "qlr"}:
+            raise ValueError("cache_mode must be one of: none, r, lr, qlr.")
+        self.cache_mode = cache_mode
+        self.cache_dequant = cache_mode == "qlr"
         self.chunk_size = chunk_size
 
         self.register_buffer("q_values", q_weight.values)
@@ -101,45 +109,60 @@ class CalderaLinear(nn.Module):
             raise ValueError("Packed columns metadata is missing.")
         return unpack_packed(values, pack_bits, packed_cols)
 
-    def _maybe_dequant(
-        self, dtype: torch.dtype, device: torch.device
-    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    def _cache_q(self) -> bool:
+        return self.cache_mode == "qlr"
+
+    def _cache_l(self) -> bool:
+        return self.cache_mode in {"qlr", "lr"}
+
+    def _cache_r(self) -> bool:
+        return self.cache_mode in {"qlr", "lr", "r"}
+
+    def _maybe_dequant_q(self, dtype: torch.dtype, device: torch.device) -> torch.Tensor:
         if (
-            self.cache_dequant
+            self._cache_q()
             and self._q_deq is not None
             and self._q_deq.dtype == dtype
             and self._q_deq.device == device
         ):
-            return self._q_deq, self._l_deq, self._r_deq  # type: ignore[return-value]
+            return self._q_deq
 
         q_vals = self._unpack_values(self.q_values, self.q_pack_bits, self.q_packed_cols)
-        l_vals = self._unpack_values(self.l_values, self.l_pack_bits, self.l_packed_cols)
-        r_vals = self._unpack_values(self.r_values, self.r_pack_bits, self.r_packed_cols)
         q = dequantize_groupwise(
             QuantizedTensor(q_vals, self.q_scales, self.group_size, 0)
         )
+        if q.dtype != dtype or q.device != device:
+            q = q.to(device=device, dtype=dtype)
+
+        if self._cache_q():
+            self._q_deq = q
+
+        return q
+
+    def _maybe_dequant_l(self, dtype: torch.dtype, device: torch.device) -> torch.Tensor:
+        if (
+            self._cache_l()
+            and self._l_deq is not None
+            and self._l_deq.dtype == dtype
+            and self._l_deq.device == device
+        ):
+            return self._l_deq
+
+        l_vals = self._unpack_values(self.l_values, self.l_pack_bits, self.l_packed_cols)
         l = dequantize_groupwise(
             QuantizedTensor(l_vals, self.l_scales, self.group_size, 0)
         )
-        r = dequantize_groupwise(
-            QuantizedTensor(r_vals, self.r_scales, self.group_size, 0)
-        )
-
-        if q.dtype != dtype or q.device != device:
-            q = q.to(device=device, dtype=dtype)
+        if l.dtype != dtype or l.device != device:
             l = l.to(device=device, dtype=dtype)
-            r = r.to(device=device, dtype=dtype)
 
-        if self.cache_dequant:
-            self._q_deq = q
+        if self._cache_l():
             self._l_deq = l
-            self._r_deq = r
 
-        return q, l, r
+        return l
 
     def _maybe_dequant_r(self, dtype: torch.dtype, device: torch.device) -> torch.Tensor:
         if (
-            self.cache_dequant
+            self._cache_r()
             and self._r_deq is not None
             and self._r_deq.dtype == dtype
             and self._r_deq.device == device
@@ -153,7 +176,7 @@ class CalderaLinear(nn.Module):
         if r.dtype != dtype or r.device != device:
             r = r.to(device=device, dtype=dtype)
 
-        if self.cache_dequant:
+        if self._cache_r():
             self._r_deq = r
 
         return r
@@ -165,7 +188,9 @@ class CalderaLinear(nn.Module):
         x = x.reshape(-1, original_shape[-1])
 
         if self.chunk_size is None or self.chunk_size >= self.out_features:
-            q, l, r = self._maybe_dequant(dtype, device)
+            q = self._maybe_dequant_q(dtype, device)
+            l = self._maybe_dequant_l(dtype, device)
+            r = self._maybe_dequant_r(dtype, device)
             xr = x @ r.t()
             base = x @ q.t()
             low_rank = xr @ l.t()
@@ -173,35 +198,48 @@ class CalderaLinear(nn.Module):
         else:
             r = self._maybe_dequant_r(dtype, device)
             xr = x @ r.t()
+            q_full = None
+            l_full = None
+            if self._cache_q():
+                q_full = self._maybe_dequant_q(dtype, device)
+            if self._cache_l():
+                l_full = self._maybe_dequant_l(dtype, device)
             outputs = []
             for start in range(0, self.out_features, self.chunk_size):
                 end = min(start + self.chunk_size, self.out_features)
-                q_vals = self._unpack_values(
-                    self.q_values[start:end],
-                    self.q_pack_bits,
-                    self.q_packed_cols,
-                )
-                q_chunk = dequantize_groupwise(
-                    QuantizedTensor(
-                        q_vals,
-                        self.q_scales[start:end],
-                        self.group_size,
-                        0,
+                if q_full is None:
+                    q_vals = self._unpack_values(
+                        self.q_values[start:end],
+                        self.q_pack_bits,
+                        self.q_packed_cols,
                     )
-                ).to(device=device, dtype=dtype)
-                l_vals = self._unpack_values(
-                    self.l_values[start:end],
-                    self.l_pack_bits,
-                    self.l_packed_cols,
-                )
-                l_chunk = dequantize_groupwise(
-                    QuantizedTensor(
-                        l_vals,
-                        self.l_scales[start:end],
-                        self.group_size,
-                        0,
+                    q_chunk = dequantize_groupwise(
+                        QuantizedTensor(
+                            q_vals,
+                            self.q_scales[start:end],
+                            self.group_size,
+                            0,
+                        )
+                    ).to(device=device, dtype=dtype)
+                else:
+                    q_chunk = q_full[start:end]
+
+                if l_full is None:
+                    l_vals = self._unpack_values(
+                        self.l_values[start:end],
+                        self.l_pack_bits,
+                        self.l_packed_cols,
                     )
-                ).to(device=device, dtype=dtype)
+                    l_chunk = dequantize_groupwise(
+                        QuantizedTensor(
+                            l_vals,
+                            self.l_scales[start:end],
+                            self.group_size,
+                            0,
+                        )
+                    ).to(device=device, dtype=dtype)
+                else:
+                    l_chunk = l_full[start:end]
                 base = x @ q_chunk.t()
                 low_rank = xr @ l_chunk.t()
                 outputs.append(base + low_rank)
@@ -267,6 +305,7 @@ def load_caldera_layer(
     path: Path,
     bias: torch.Tensor | None = None,
     cache_dequant: bool = False,
+    cache_mode: str | None = None,
     chunk_size: int | None = 1024,
 ) -> CalderaLinear:
     payload = torch.load(path, map_location="cpu")
@@ -281,6 +320,7 @@ def load_caldera_layer(
         r,
         bias=bias,
         cache_dequant=cache_dequant,
+        cache_mode=cache_mode,
         chunk_size=chunk_size,
     )
 
@@ -293,11 +333,44 @@ def _set_module(root: nn.Module, name: str, module: nn.Module) -> None:
     setattr(parent, parts[-1], module)
 
 
+def _get_device_for_module(model: nn.Module, module_name: str) -> torch.device | None:
+    """Get the target device for a module from model's hf_device_map.
+
+    For sharded models with device_map='auto', the hf_device_map stores device
+    assignments at the block/layer level, not individual submodules. We need to
+    find the parent layer that contains this module.
+    """
+    if not hasattr(model, "hf_device_map") or not model.hf_device_map:
+        return None
+
+    device_map = model.hf_device_map
+
+    # Try exact match first
+    if module_name in device_map:
+        dev = device_map[module_name]
+        if isinstance(dev, int):
+            return torch.device(f"cuda:{dev}")
+        return torch.device(dev)
+
+    # Try parent prefixes (e.g., "model.layers.0.self_attn.q_proj" -> "model.layers.0")
+    parts = module_name.split(".")
+    for i in range(len(parts) - 1, 0, -1):
+        prefix = ".".join(parts[:i])
+        if prefix in device_map:
+            dev = device_map[prefix]
+            if isinstance(dev, int):
+                return torch.device(f"cuda:{dev}")
+            return torch.device(dev)
+
+    return None
+
+
 def apply_caldera(
     model: nn.Module,
     artifacts_dir: Path,
     *,
     cache_dequant: bool = False,
+    cache_mode: str | None = None,
     chunk_size: int | None = 1024,
     device: torch.device | None = None,
     strict: bool = False,
@@ -305,34 +378,64 @@ def apply_caldera(
     layers_dir = artifacts_dir / "layers"
     replaced: list[str] = []
 
+    # Collect modules to replace first (can't modify during iteration)
+    modules_to_replace = []
     for name, module in model.named_modules():
         if not isinstance(module, nn.Linear):
             continue
         artifact = layers_dir / f"{name.replace('.', '_')}.pt"
         if not artifact.exists():
             continue
-        bias = module.bias.detach().clone() if module.bias is not None else None
+        modules_to_replace.append((name, module, artifact))
+
+    for name, module, artifact in modules_to_replace:
+        # Determine target device BEFORE freeing the original module
+        if device is not None:
+            target_device = device
+        else:
+            mapped_device = _get_device_for_module(model, name)
+            if mapped_device is not None:
+                target_device = mapped_device
+            else:
+                weight_device = module.weight.device
+                if weight_device.type == "meta":
+                    try:
+                        target_device = next(
+                            param.device for param in model.parameters() if not param.is_meta
+                        )
+                    except StopIteration:
+                        target_device = torch.device("cpu")
+                else:
+                    target_device = weight_device
+
+        # Save bias before freeing the module
+        bias = module.bias.detach().clone().cpu() if module.bias is not None else None
+
+        # FREE THE ORIGINAL MODULE'S MEMORY before loading replacement
+        # Move weight to CPU to free GPU memory
+        if module.weight.device.type == "cuda":
+            module.weight.data = module.weight.data.to("cpu")
+            if module.bias is not None:
+                module.bias.data = module.bias.data.to("cpu")
+            torch.cuda.empty_cache()
+
+        # Load CALDERA layer (starts on CPU)
         caldera_layer = load_caldera_layer(
             artifact,
             bias=bias,
             cache_dequant=cache_dequant,
+            cache_mode=cache_mode,
             chunk_size=chunk_size,
         )
-        target_device = device
-        if target_device is None:
-            weight_device = module.weight.device
-            if weight_device.type == "meta":
-                try:
-                    target_device = next(
-                        param.device for param in model.parameters() if not param.is_meta
-                    )
-                except StopIteration:
-                    target_device = torch.device("cpu")
-            else:
-                target_device = weight_device
+
+        # Move to target device
         caldera_layer = caldera_layer.to(target_device)
         _set_module(model, name, caldera_layer)
         replaced.append(name)
+
+        # Clear cache after each replacement to free memory
+        if target_device.type == "cuda":
+            torch.cuda.empty_cache()
 
     if strict and not replaced:
         raise RuntimeError(f"No CALDERA layers found in {layers_dir}")

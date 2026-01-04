@@ -84,6 +84,7 @@ def load_model_with_caldera(
     device: torch.device,
     dtype: torch.dtype,
     cache_dequant: bool = False,
+    cache_mode: str | None = None,
     chunk_size: int | None = 1024,
     offload_input_embeddings: bool = False,
     offload_output_embeddings: bool = False,
@@ -150,6 +151,7 @@ def load_model_with_caldera(
             model,
             artifacts_dir,
             cache_dequant=cache_dequant,
+            cache_mode=cache_mode,
             chunk_size=chunk_size,
             device=device,
         )
@@ -172,6 +174,7 @@ def load_model_with_caldera(
         model,
         artifacts_dir,
         cache_dequant=cache_dequant,
+        cache_mode=cache_mode,
         chunk_size=chunk_size,
     )
     if not replaced:

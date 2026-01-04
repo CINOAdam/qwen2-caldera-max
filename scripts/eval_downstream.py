@@ -16,6 +16,16 @@ from src.caldera_loader import load_model_with_caldera
 from src.caldera_runtime import apply_caldera
 
 
+def get_model_device(model) -> torch.device:
+    """Get the input device for a model (handles sharded models)."""
+    if hasattr(model, 'hf_device_map') and model.hf_device_map:
+        first_device = next(iter(model.hf_device_map.values()))
+        if isinstance(first_device, int):
+            return torch.device(f"cuda:{first_device}")
+        return torch.device(first_device)
+    return model.device
+
+
 def load_compressed_model(model_id: str, caldera_dir: str, dtype: torch.dtype, device_map: str = "auto"):
     """Load model with CALDERA compression applied."""
     model = AutoModelForCausalLM.from_pretrained(
@@ -27,7 +37,7 @@ def load_compressed_model(model_id: str, caldera_dir: str, dtype: torch.dtype, d
     caldera_path = Path(caldera_dir)
     if caldera_path.exists():
         layers_applied = apply_caldera(model, caldera_path)
-        print(f"Applied CALDERA layers: {layers_applied}")
+        print(f"Applied CALDERA layers: {len(layers_applied)}")
 
     model.eval()
     return model
@@ -71,7 +81,7 @@ def evaluate_mmlu(model, tokenizer, subjects: list[str], num_shots: int = 5, max
             prompt += format_question(item) + "\nAnswer:"
 
             # Get model prediction
-            inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+            inputs = tokenizer(prompt, return_tensors="pt").to(get_model_device(model))
 
             with torch.no_grad():
                 outputs = model.generate(

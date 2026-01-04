@@ -230,6 +230,41 @@ PYTHONPATH=. python scripts/mixkvq_generate.py \
 - 2026-01-03: Optimized `CalderaLinear` to reuse cached R dequantization and avoid
   double-dequant in the non-chunk path; added a small smoke test. This reduces
   per-step overhead when `cache_dequant=True`.
+- 2026-01-03: Added a `caldera_cached` backend to `benchmarks/run_kernel_bench.py`
+  to benchmark `CalderaLinear` with optional dequant caching.
+- 2026-01-03: Added Caldera cache modes (`none`, `r`, `lr`, `qlr`) and a `--device`
+  flag to `benchmarks/run_kernel_bench.py`; `CalderaLinear` now supports selective
+  dequant caching for R-only or L+R.
+- 2026-01-03: Attempted GPU Caldera cache sweep; torch CUDA init failed with
+  `cudaGetDeviceCount` error 304 and `Can't initialize NVML`, so GPU benches are
+  blocked until CUDA is visible to torch.
+- 2026-01-03: CalderaLinear cache A/B at 2048x2048x128: cache on avg_time_s=1.14e-04
+  (~82.8 GFLOPs), cache off avg_time_s=2.34e-03 (~4.04 GFLOPs). Logged to
+  `artifacts/kernel_bench.csv` with tags `caldera-cache-on`/`caldera-cache-off`.
+- 2026-01-03: Mojo cached benchmark at 2048x2048x128: avg_time_s=3.74e-03 (~2.53 GFLOPs),
+  tagged `mojo-cache-2048` in `artifacts/kernel_bench.csv`.
+- 2026-01-03: 4096x4096x128 cache A/B: Caldera cache on avg_time_s=2.51e-04
+  (~142.1 GFLOPs), cache off avg_time_s=2.29e-02 (~1.56 GFLOPs), Mojo cached
+  avg_time_s=1.53e-02 (~2.34 GFLOPs). Logged to `artifacts/kernel_bench.csv`
+  with tags `caldera-cache-on-4096`, `caldera-cache-off-4096`, `mojo-cache-4096`.
 - 2026-01-04: Started 72B compression on RunPod (2x A100 80GB). Baseline results:
   PPL=8.6955, MMLU=73.3% (abstract_algebra 74%, high_school_math 62%, computer_security 84%).
   3bit-uniform compression in progress. Fidelity queued to run after compression.
+- 2026-01-04: CPU Caldera cache-mode sweep at 2048x2048x128: none avg_time_s=4.344e-03
+  (~2.17 GFLOPs), r avg_time_s=3.714e-03 (~2.54 GFLOPs), lr avg_time_s=4.592e-03
+  (~2.06 GFLOPs), qlr avg_time_s=1.22e-04 (~77.2 GFLOPs). Logged with tags
+  `caldera-cache-none-2048-cpu`, `caldera-cache-r-2048-cpu`, `caldera-cache-lr-2048-cpu`,
+  `caldera-cache-qlr-2048-cpu`.
+- 2026-01-04: CPU Caldera cache-mode sweep at 4096x4096x128: none avg_time_s=2.374e-02
+  (~1.50 GFLOPs), r avg_time_s=2.595e-02 (~1.37 GFLOPs), lr avg_time_s=2.287e-02
+  (~1.56 GFLOPs), qlr avg_time_s=1.29e-04 (~276 GFLOPs). Logged with tags
+  `caldera-cache-none-4096-cpu`, `caldera-cache-r-4096-cpu`, `caldera-cache-lr-4096-cpu`,
+  `caldera-cache-qlr-4096-cpu`.
+- 2026-01-04: Completed 72B compression + evaluation on RunPod (2x A100 80GB).
+  Fixed multi-GPU CALDERA support (added `_get_device_for_module()` for hf_device_map
+  lookup at layer level, freed original Linear weights before loading replacements).
+  Final results:
+  * PPL: baseline=8.70, 3bit-uniform=12.65, 3bit-ultra=12.48 (ultra 1.3% better)
+  * MMLU: baseline=73.3%, 3bit-uniform=67.3%, 3bit-ultra=70.0% (ultra +2.7pp)
+  * computer_security: uniform=84%, ultra=90% (+6pp from protecting late layers)
+  Updated `docs/phase0_validation_report.md` with 72B results section.

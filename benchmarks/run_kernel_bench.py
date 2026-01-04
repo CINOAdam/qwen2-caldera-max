@@ -5,8 +5,10 @@ import time
 from pathlib import Path
 
 import numpy as np
+import torch
 
 from src.q_lr_reference import q_lr_forward, quantize_groupwise
+from src.caldera_runtime import CalderaLinear, QuantizedTensor
 
 
 DEFAULTS = {
@@ -102,6 +104,89 @@ def _run_mojo_cached(
     return avg, out
 
 
+def _run_mojo_auto(
+    q_q,
+    l_q,
+    r_q,
+    x,
+    *,
+    iters: int,
+    warmup: int,
+) -> tuple[float, np.ndarray]:
+    from src.q_lr_mojo import q_lr_auto
+
+    for _ in range(warmup):
+        _ = q_lr_auto(q_q, l_q, r_q, x)
+
+    timings = []
+    out = None
+    for _ in range(iters):
+        start = time.perf_counter()
+        out = q_lr_auto(q_q, l_q, r_q, x)
+        timings.append(time.perf_counter() - start)
+    avg = sum(timings) / len(timings)
+    if out is None:
+        out = q_lr_auto(q_q, l_q, r_q, x)
+    return avg, out
+
+
+def _run_caldera_cached(
+    q_q,
+    l_q,
+    r_q,
+    x,
+    *,
+    iters: int,
+    warmup: int,
+    cache_dequant: bool,
+    cache_mode: str | None,
+    device: torch.device,
+) -> tuple[float, np.ndarray]:
+    if device.type == "cuda" and not torch.cuda.is_available():
+        raise RuntimeError("CUDA requested for Caldera benchmark but is not available.")
+    q_t = QuantizedTensor(
+        values=torch.from_numpy(q_q.values),
+        scales=torch.from_numpy(q_q.scales),
+        group_size=q_q.group_size,
+        num_bits=q_q.num_bits,
+    )
+    l_t = QuantizedTensor(
+        values=torch.from_numpy(l_q.values),
+        scales=torch.from_numpy(l_q.scales),
+        group_size=l_q.group_size,
+        num_bits=l_q.num_bits,
+    )
+    r_t = QuantizedTensor(
+        values=torch.from_numpy(r_q.values),
+        scales=torch.from_numpy(r_q.scales),
+        group_size=r_q.group_size,
+        num_bits=r_q.num_bits,
+    )
+    layer = CalderaLinear(
+        q_t,
+        l_t,
+        r_t,
+        cache_dequant=cache_dequant,
+        cache_mode=cache_mode,
+        chunk_size=None,
+    ).to(device)
+    x_t = torch.from_numpy(x).to(device)
+
+    for _ in range(warmup):
+        _ = layer(x_t)
+
+    timings = []
+    out = None
+    for _ in range(iters):
+        start = time.perf_counter()
+        out = layer(x_t)
+        timings.append(time.perf_counter() - start)
+    avg = sum(timings) / len(timings)
+    if out is None:
+        out = layer(x_t)
+    return avg, out.detach().cpu().numpy()
+
+
 def _maybe_gflops(rows: int, cols: int, rank: int, avg_time_s: float) -> float | None:
     if avg_time_s <= 0:
         return None
@@ -166,7 +251,7 @@ def main() -> None:
     parser.add_argument("--warmup", type=int, default=1, help="Warmup iterations")
     parser.add_argument(
         "--backend",
-        choices=("reference", "mojo", "mojo_cached", "both"),
+        choices=("reference", "mojo", "mojo_cached", "mojo_auto", "caldera_cached", "both"),
         default="both",
         help="Which backend to run",
     )
@@ -174,6 +259,22 @@ def main() -> None:
         "--validate",
         action="store_true",
         help="Compare mojo output to reference output",
+    )
+    parser.add_argument(
+        "--caldera-cache-dequant",
+        action="store_true",
+        help="Cache dequantized Q/L/R for the Caldera baseline",
+    )
+    parser.add_argument(
+        "--caldera-cache-mode",
+        choices=("none", "r", "lr", "qlr"),
+        default=None,
+        help="Selective dequant cache for Caldera (overrides --caldera-cache-dequant)",
+    )
+    parser.add_argument(
+        "--device",
+        default="cpu",
+        help="Device to use for Caldera benchmark (e.g., cpu, cuda, cuda:0)",
     )
     parser.add_argument(
         "--log-csv",
@@ -184,6 +285,11 @@ def main() -> None:
     parser.add_argument("--tag", default="", help="Optional tag for CSV logging")
     parser.add_argument("--seed", type=int, default=0, help="Random seed")
     args = parser.parse_args()
+    if args.caldera_cache_mode is not None and args.caldera_cache_dequant:
+        raise SystemExit("Use either --caldera-cache-mode or --caldera-cache-dequant, not both.")
+    caldera_cache_mode = args.caldera_cache_mode
+    if caldera_cache_mode is None and args.caldera_cache_dequant:
+        caldera_cache_mode = "qlr"
 
     config = DEFAULTS.copy()
     if args.preset is not None:
@@ -216,6 +322,10 @@ def main() -> None:
     mojo_out = None
     mojo_cached_time = None
     mojo_cached_out = None
+    mojo_auto_time = None
+    mojo_auto_out = None
+    caldera_time = None
+    caldera_out = None
     val_max = None
     val_mean = None
 
@@ -263,6 +373,28 @@ def main() -> None:
             iters=args.iters,
         )
 
+    if args.backend == "mojo_auto":
+        mojo_auto_time, mojo_auto_out = _run_mojo_auto(
+            q_q,
+            l_q,
+            r_q,
+            x,
+            iters=args.iters,
+            warmup=args.warmup,
+        )
+        _print_summary(
+            "mojo_auto",
+            avg_time_s=mojo_auto_time,
+            rows=out_dim,
+            cols=in_dim,
+            rank=rank,
+            group_size=group_size,
+            bits_q=bits_q,
+            bits_lr=bits_lr,
+            warmup=args.warmup,
+            iters=args.iters,
+        )
+
     if args.backend == "mojo_cached":
         mojo_cached_time, mojo_cached_out = _run_mojo_cached(
             q_q,
@@ -285,6 +417,31 @@ def main() -> None:
             iters=args.iters,
         )
 
+    if args.backend == "caldera_cached":
+        caldera_time, caldera_out = _run_caldera_cached(
+            q_q,
+            l_q,
+            r_q,
+            x,
+            iters=args.iters,
+            warmup=args.warmup,
+            cache_dequant=args.caldera_cache_dequant,
+            cache_mode=caldera_cache_mode,
+            device=torch.device(args.device),
+        )
+        _print_summary(
+            "caldera_cached",
+            avg_time_s=caldera_time,
+            rows=out_dim,
+            cols=in_dim,
+            rank=rank,
+            group_size=group_size,
+            bits_q=bits_q,
+            bits_lr=bits_lr,
+            warmup=args.warmup,
+            iters=args.iters,
+        )
+
     if args.validate:
         if ref_out is None:
             _, ref_out = _run_reference(
@@ -295,7 +452,12 @@ def main() -> None:
                 iters=1,
                 warmup=0,
             )
-        if mojo_out is None and mojo_cached_out is None:
+        if (
+            mojo_out is None
+            and mojo_cached_out is None
+            and mojo_auto_out is None
+            and caldera_out is None
+        ):
             _, mojo_out = _run_mojo(
                 q_q,
                 l_q,
@@ -304,7 +466,15 @@ def main() -> None:
                 iters=1,
                 warmup=0,
             )
-        cmp_out = mojo_out if mojo_out is not None else mojo_cached_out
+        if caldera_out is not None:
+            cmp_out = caldera_out
+        else:
+            if mojo_out is not None:
+                cmp_out = mojo_out
+            elif mojo_cached_out is not None:
+                cmp_out = mojo_cached_out
+            else:
+                cmp_out = mojo_auto_out
         diff = np.abs(cmp_out - ref_out)
         val_max = float(diff.max())
         val_mean = float(diff.mean())
@@ -364,6 +534,50 @@ def main() -> None:
                     "backend": "mojo_cached",
                     "avg_time_s": mojo_cached_time,
                     "gflops": _maybe_gflops(out_dim, in_dim, rank, mojo_cached_time),
+                    "rows": out_dim,
+                    "cols": in_dim,
+                    "rank": rank,
+                    "group_size": group_size,
+                    "bits_q": bits_q,
+                    "bits_lr": bits_lr,
+                    "warmup": args.warmup,
+                    "iters": args.iters,
+                    "seed": args.seed,
+                    "preset": args.preset or "",
+                    "tag": args.tag,
+                    "val_max_abs": val_max,
+                    "val_mean_abs": val_mean,
+                }
+            )
+        if mojo_auto_time is not None:
+            rows.append(
+                {
+                    "timestamp": timestamp,
+                    "backend": "mojo_auto",
+                    "avg_time_s": mojo_auto_time,
+                    "gflops": _maybe_gflops(out_dim, in_dim, rank, mojo_auto_time),
+                    "rows": out_dim,
+                    "cols": in_dim,
+                    "rank": rank,
+                    "group_size": group_size,
+                    "bits_q": bits_q,
+                    "bits_lr": bits_lr,
+                    "warmup": args.warmup,
+                    "iters": args.iters,
+                    "seed": args.seed,
+                    "preset": args.preset or "",
+                    "tag": args.tag,
+                    "val_max_abs": val_max,
+                    "val_mean_abs": val_mean,
+                }
+            )
+        if caldera_time is not None:
+            rows.append(
+                {
+                    "timestamp": timestamp,
+                    "backend": "caldera_cached",
+                    "avg_time_s": caldera_time,
+                    "gflops": _maybe_gflops(out_dim, in_dim, rank, caldera_time),
                     "rows": out_dim,
                     "cols": in_dim,
                     "rank": rank,

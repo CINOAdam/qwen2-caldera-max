@@ -162,8 +162,14 @@ def main() -> None:
             model.to(device)
             if args.report_memory:
                 report_memory(device, "after_load")
-        elif args.caldera_dir is not None:
-            raise SystemExit("CALDERA apply is only supported for single-device runs.")
+        else:
+            # For sharded models, determine the first device for input tensors
+            if hasattr(model, 'hf_device_map') and model.hf_device_map:
+                first_device = next(iter(model.hf_device_map.values()))
+                if isinstance(first_device, int):
+                    device = torch.device(f"cuda:{first_device}")
+                else:
+                    device = torch.device(first_device)
 
         if args.caldera_dir is not None:
             replaced = apply_caldera(
