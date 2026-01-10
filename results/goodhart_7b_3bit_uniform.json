@@ -1,0 +1,113 @@
+{
+  "model_id": "Qwen/Qwen2-7B-Instruct",
+  "caldera_dir": "artifacts/qwen2-7b/caldera-3bit-uniform",
+  "summary": {
+    "total": 7,
+    "understands": 0,
+    "executes": 1,
+    "gaps": 0,
+    "gap_ids": [],
+    "by_category": {
+      "multi_step_math": {
+        "pass": 0,
+        "fail": 1,
+        "gap": 0
+      },
+      "time": {
+        "pass": 0,
+        "fail": 1,
+        "gap": 0
+      },
+      "financial": {
+        "pass": 0,
+        "fail": 1,
+        "gap": 0
+      },
+      "recipe": {
+        "pass": 0,
+        "fail": 1,
+        "gap": 0
+      },
+      "units": {
+        "pass": 0,
+        "fail": 1,
+        "gap": 0
+      },
+      "logic": {
+        "pass": 1,
+        "fail": 0,
+        "gap": 0
+      },
+      "scheduling": {
+        "pass": 0,
+        "fail": 1,
+        "gap": 0
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "discount_coupon",
+      "category": "multi_step_math",
+      "understands": false,
+      "executes_correctly": false,
+      "extracted_answer": "\\$}$/",
+      "correct_answer": "15",
+      "gap_type": null
+    },
+    {
+      "id": "time_duration",
+      "category": "time",
+      "understands": false,
+      "executes_correctly": false,
+      "extracted_answer": "Meeting ends time: \u4e0b\u5348\u4e09\u70b9\u4e09\u5341\u4e94\u5206",
+      "correct_answer": "4:15 PM",
+      "gap_type": null
+    },
+    {
+      "id": "financial_compound",
+      "category": "financial",
+      "understands": false,
+      "executes_correctly": false,
+      "extracted_answer": "To calculate the final amount, Initial investment ($) =$:\";\r\n1:';\n3. Calculate...', 4. Final amount after...', 5. Taxes paid on the gain:\n\n\nFinal amount after taxes:\n\n\nFinal amount:\n\n\nFinal Amount:\n\n\nFinal A:",
+      "correct_answer": "1168",
+      "gap_type": null
+    },
+    {
+      "id": "recipe_scale",
+      "category": "recipe",
+      "understands": false,
+      "executes_correctly": false,
+      "extracted_answer": "\ud83e\udd14 Hmm\ud83e\udd14",
+      "correct_answer": "6",
+      "gap_type": null
+    },
+    {
+      "id": "unit_chain",
+      "category": "units",
+      "understands": false,
+      "executes_correctly": false,
+      "extracted_answer": "Given-lnk{converted value}",
+      "correct_answer": "6.3",
+      "gap_type": null
+    },
+    {
+      "id": "transitive_order",
+      "category": "logic",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "Alice",
+      "correct_answer": "Alice, Bob, Carol, David",
+      "gap_type": "DOES_BUT_DOESNT_KNOW"
+    },
+    {
+      "id": "task_schedule",
+      "category": "scheduling",
+      "understands": false,
+      "executes_correctly": false,
+      "extracted_answer": "Given:\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n ",
+      "correct_answer": "12 PM",
+      "gap_type": null
+    }
+  ]
+}

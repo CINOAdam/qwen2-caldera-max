@@ -34,7 +34,9 @@ caldera:
 
   use_rht: false
   lora_finetune: false
+  layer_order: late-first  # De-risk storage failures by compressing critical layers first
 
 runtime:
   dtype: bf16
   device: cuda
+  device_map: auto

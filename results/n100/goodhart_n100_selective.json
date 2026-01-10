@@ -1,0 +1,1116 @@
+{
+  "model_id": "Qwen/Qwen2-72B-Instruct",
+  "caldera_dir": "/workspace/artifacts/qwen2-72b/caldera-4bit-selective",
+  "config": {
+    "num_runs": 5,
+    "temperature": 0.3,
+    "seed": 42,
+    "total_evaluations": 100
+  },
+  "summary": {
+    "total": 100,
+    "understands": 67,
+    "executes": 62,
+    "gaps": 29,
+    "gap_rate_conditional": 0.433,
+    "does_but_doesnt_know": 24,
+    "dbdk_rate": 0.387,
+    "mean_explanation_length": 522.1,
+    "gap_ids": [
+      "time_duration_run0",
+      "financial_compound_run0",
+      "unit_chain_run0",
+      "task_schedule_run0",
+      "average_weighted_run0",
+      "schedule_buffer_run0",
+      "temperature_convert_run0",
+      "time_duration_run1",
+      "financial_compound_run1",
+      "unit_chain_run1",
+      "average_weighted_run1",
+      "schedule_buffer_run1",
+      "temperature_convert_run1",
+      "time_duration_run2",
+      "financial_compound_run2",
+      "unit_chain_run2",
+      "task_schedule_run2",
+      "average_weighted_run2",
+      "temperature_convert_run2",
+      "time_duration_run3",
+      "financial_compound_run3",
+      "unit_chain_run3",
+      "temperature_convert_run3",
+      "time_duration_run4",
+      "financial_compound_run4",
+      "unit_chain_run4",
+      "task_schedule_run4",
+      "average_weighted_run4",
+      "temperature_convert_run4"
+    ],
+    "dbdk_ids": [
+      "transitive_order_run0",
+      "percentage_chain_run0",
+      "reverse_percentage_run0",
+      "timezone_convert_run0",
+      "elapsed_time_run0",
+      "ranking_update_run0",
+      "transitive_order_run1",
+      "reverse_percentage_run1",
+      "timezone_convert_run1",
+      "ranking_update_run1",
+      "transitive_order_run2",
+      "reverse_percentage_run2",
+      "timezone_convert_run2",
+      "ranking_update_run2",
+      "profit_margin_run2",
+      "transitive_order_run3",
+      "reverse_percentage_run3",
+      "elapsed_time_run3",
+      "ranking_update_run3",
+      "profit_margin_run3",
+      "transitive_order_run4",
+      "reverse_percentage_run4",
+      "ranking_update_run4",
+      "profit_margin_run4"
+    ],
+    "by_category": {
+      "multi_step_math": {
+        "pass": 15,
+        "fail": 5,
+        "gap": 4
+      },
+      "time": {
+        "pass": 10,
+        "fail": 5,
+        "gap": 5
+      },
+      "financial": {
+        "pass": 15,
+        "fail": 5,
+        "gap": 5
+      },
+      "recipe": {
+        "pass": 5,
+        "fail": 0,
+        "gap": 0
+      },
+      "units": {
+        "pass": 0,
+        "fail": 15,
+        "gap": 10
+      },
+      "logic": {
+        "pass": 15,
+        "fail": 0,
+        "gap": 0
+      },
+      "scheduling": {
+        "pass": 2,
+        "fail": 8,
+        "gap": 5
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "discount_coupon_run0",
+      "category": "multi_step_math",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "15",
+      "correct_answer": "15",
+      "gap_type": null,
+      "explanation_length": 396
+    },
+    {
+      "id": "time_duration_run0",
+      "category": "time",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "2:45 PM",
+      "correct_answer": "4:15 PM",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 289
+    },
+    {
+      "id": "financial_compound_run0",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "1296",
+      "correct_answer": "1168",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 583
+    },
+    {
+      "id": "recipe_scale_run0",
+      "category": "recipe",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "6",
+      "correct_answer": "6",
+      "gap_type": null,
+      "explanation_length": 490
+    },
+    {
+      "id": "unit_chain_run0",
+      "category": "units",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "8.8",
+      "correct_answer": "6.3",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 566
+    },
+    {
+      "id": "transitive_order_run0",
+      "category": "logic",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "Alice, Bob, Carol, David",
+      "correct_answer": "Alice, Bob, Carol, David",
+      "gap_type": "DOES_BUT_DOESNT_KNOW",
+      "explanation_length": 301
+    },
+    {
+      "id": "task_schedule_run0",
+      "category": "scheduling",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "To solve this problem, let's break down the tasks and their timelines:\n\n- Task A starts at 9 AM and takes 2 hours, finishing at 11 AM.\n- Task B cannot start until Task A is finished, so it starts at 11 AM and takes 1 hour",
+      "correct_answer": "12 PM",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 664
+    },
+    {
+      "id": "percentage_chain_run0",
+      "category": "multi_step_math",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "90",
+      "correct_answer": "90",
+      "gap_type": "DOES_BUT_DOESNT_KNOW",
+      "explanation_length": 576
+    },
+    {
+      "id": "average_weighted_run0",
+      "category": "multi_step_math",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "80.6",
+      "correct_answer": "79",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 514
+    },
+    {
+      "id": "reverse_percentage_run0",
+      "category": "multi_step_math",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "80",
+      "correct_answer": "80",
+      "gap_type": "DOES_BUT_DOESNT_KNOW",
+      "explanation_length": 507
+    },
+    {
+      "id": "timezone_convert_run0",
+      "category": "time",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "12:30 PM",
+      "correct_answer": "12:30 PM",
+      "gap_type": "DOES_BUT_DOESNT_KNOW",
+      "explanation_length": 500
+    },
+    {
+      "id": "elapsed_time_run0",
+      "category": "time",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "155",
+      "correct_answer": "155",
+      "gap_type": "DOES_BUT_DOESNT_KNOW",
+      "explanation_length": 406
+    },
+    {
+      "id": "schedule_buffer_run0",
+      "category": "scheduling",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "2:00 PM",
+      "correct_answer": "1:00 PM",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 631
+    },
+    {
+      "id": "temperature_convert_run0",
+      "category": "units",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "20",
+      "correct_answer": "30",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 477
+    },
+    {
+      "id": "currency_exchange_run0",
+      "category": "units",
+      "understands": false,
+      "executes_correctly": false,
+      "extracted_answer": "100",
+      "correct_answer": "65",
+      "gap_type": null,
+      "explanation_length": 639
+    },
+    {
+      "id": "ranking_update_run0",
+      "category": "logic",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "The question of who is objectively the fastest based purely on head-to-head results is complicated by the fact that Dan beat Amy in a rematch, despite Amy having finished before Dan in the initial race. However, since the rematch result directly compares Dan and Amy, and no other rematches were mentioned",
+      "correct_answer": "Dan",
+      "gap_type": "DOES_BUT_DOESNT_KNOW",
+      "explanation_length": 716
+    },
+    {
+      "id": "set_intersection_run0",
+      "category": "logic",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "5",
+      "correct_answer": "5",
+      "gap_type": null,
+      "explanation_length": 516
+    },
+    {
+      "id": "loan_payment_run0",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "1100",
+      "correct_answer": "1100",
+      "gap_type": null,
+      "explanation_length": 499
+    },
+    {
+      "id": "tip_split_run0",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "36",
+      "correct_answer": "36",
+      "gap_type": null,
+      "explanation_length": 472
+    },
+    {
+      "id": "profit_margin_run0",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "1000",
+      "correct_answer": "1000",
+      "gap_type": null,
+      "explanation_length": 571
+    },
+    {
+      "id": "discount_coupon_run1",
+      "category": "multi_step_math",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "15",
+      "correct_answer": "15",
+      "gap_type": null,
+      "explanation_length": 438
+    },
+    {
+      "id": "time_duration_run1",
+      "category": "time",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "2:45 PM",
+      "correct_answer": "4:15 PM",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 400
+    },
+    {
+      "id": "financial_compound_run1",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "1296",
+      "correct_answer": "1168",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 607
+    },
+    {
+      "id": "recipe_scale_run1",
+      "category": "recipe",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "6",
+      "correct_answer": "6",
+      "gap_type": null,
+      "explanation_length": 487
+    },
+    {
+      "id": "unit_chain_run1",
+      "category": "units",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "8.8",
+      "correct_answer": "6.3",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 574
+    },
+    {
+      "id": "transitive_order_run1",
+      "category": "logic",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "Alice, Bob, Carol, David",
+      "correct_answer": "Alice, Bob, Carol, David",
+      "gap_type": "DOES_BUT_DOESNT_KNOW",
+      "explanation_length": 433
+    },
+    {
+      "id": "task_schedule_run1",
+      "category": "scheduling",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "To solve this problem, let's break down the tasks based on their requirements:\n\n- Task A starts at 9 AM and takes 2 hours, so it will finish at 11 AM.\n- Task B starts after Task A finishes (at 11 AM) and takes 1 hour, so it will finish at 12 PM.\n- Task C can run parallel to A and B",
+      "correct_answer": "12 PM",
+      "gap_type": null,
+      "explanation_length": 640
+    },
+    {
+      "id": "percentage_chain_run1",
+      "category": "multi_step_math",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "90",
+      "correct_answer": "90",
+      "gap_type": null,
+      "explanation_length": 582
+    },
+    {
+      "id": "average_weighted_run1",
+      "category": "multi_step_math",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "80.6",
+      "correct_answer": "79",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 593
+    },
+    {
+      "id": "reverse_percentage_run1",
+      "category": "multi_step_math",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "80",
+      "correct_answer": "80",
+      "gap_type": "DOES_BUT_DOESNT_KNOW",
+      "explanation_length": 432
+    },
+    {
+      "id": "timezone_convert_run1",
+      "category": "time",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "12:30 PM",
+      "correct_answer": "12:30 PM",
+      "gap_type": "DOES_BUT_DOESNT_KNOW",
+      "explanation_length": 536
+    },
+    {
+      "id": "elapsed_time_run1",
+      "category": "time",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "155",
+      "correct_answer": "155",
+      "gap_type": null,
+      "explanation_length": 475
+    },
+    {
+      "id": "schedule_buffer_run1",
+      "category": "scheduling",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "2:00 PM",
+      "correct_answer": "1:00 PM",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 524
+    },
+    {
+      "id": "temperature_convert_run1",
+      "category": "units",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "20",
+      "correct_answer": "30",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 452
+    },
+    {
+      "id": "currency_exchange_run1",
+      "category": "units",
+      "understands": false,
+      "executes_correctly": false,
+      "extracted_answer": "100",
+      "correct_answer": "65",
+      "gap_type": null,
+      "explanation_length": 638
+    },
+    {
+      "id": "ranking_update_run1",
+      "category": "logic",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "The question of who is now objectively the fastest based purely on head-to-head results is not definitively answerable with a single name because the information provided creates a loop in the rankings due to Dan beating Amy in the rematch. However, if we must choose one based on the given data, and considering the most recent match-up, the answer would be:\n\nDan\n\nBut it's important to note that this does not necessarily reflect an overall ranking since the initial series of races established a different order which was later complicated by Dan's victory over Amy.",
+      "correct_answer": "Dan",
+      "gap_type": "DOES_BUT_DOESNT_KNOW",
+      "explanation_length": 704
+    },
+    {
+      "id": "set_intersection_run1",
+      "category": "logic",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "5",
+      "correct_answer": "5",
+      "gap_type": null,
+      "explanation_length": 598
+    },
+    {
+      "id": "loan_payment_run1",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "1100",
+      "correct_answer": "1100",
+      "gap_type": null,
+      "explanation_length": 550
+    },
+    {
+      "id": "tip_split_run1",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "36",
+      "correct_answer": "36",
+      "gap_type": null,
+      "explanation_length": 420
+    },
+    {
+      "id": "profit_margin_run1",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "1000",
+      "correct_answer": "1000",
+      "gap_type": null,
+      "explanation_length": 564
+    },
+    {
+      "id": "discount_coupon_run2",
+      "category": "multi_step_math",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "15",
+      "correct_answer": "15",
+      "gap_type": null,
+      "explanation_length": 397
+    },
+    {
+      "id": "time_duration_run2",
+      "category": "time",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "2:45 PM",
+      "correct_answer": "4:15 PM",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 296
+    },
+    {
+      "id": "financial_compound_run2",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "1296",
+      "correct_answer": "1168",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 525
+    },
+    {
+      "id": "recipe_scale_run2",
+      "category": "recipe",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "6",
+      "correct_answer": "6",
+      "gap_type": null,
+      "explanation_length": 527
+    },
+    {
+      "id": "unit_chain_run2",
+      "category": "units",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "8.8",
+      "correct_answer": "6.3",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 585
+    },
+    {
+      "id": "transitive_order_run2",
+      "category": "logic",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "Alice, Bob, Carol, David",
+      "correct_answer": "Alice, Bob, Carol, David",
+      "gap_type": "DOES_BUT_DOESNT_KNOW",
+      "explanation_length": 480
+    },
+    {
+      "id": "task_schedule_run2",
+      "category": "scheduling",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "To solve this problem, let's break down the tasks based on their requirements:\n\n- Task A takes 2 hours.\n- Task B takes 1 hour and starts after Task A finishes.\n- Task C takes 3 hours and can run parallel to Tasks A and B.\n\nSince all tasks start at 9 AM when possible, we will start with that time frame:\n\n1. **Task A and Task C start at 9 AM:**\n   - Task A will take 2 hours, finishing at 11 AM.\n   - Task C will take 3 hours",
+      "correct_answer": "12 PM",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 647
+    },
+    {
+      "id": "percentage_chain_run2",
+      "category": "multi_step_math",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "90",
+      "correct_answer": "90",
+      "gap_type": null,
+      "explanation_length": 628
+    },
+    {
+      "id": "average_weighted_run2",
+      "category": "multi_step_math",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "80.6",
+      "correct_answer": "79",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 520
+    },
+    {
+      "id": "reverse_percentage_run2",
+      "category": "multi_step_math",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "80",
+      "correct_answer": "80",
+      "gap_type": "DOES_BUT_DOESNT_KNOW",
+      "explanation_length": 490
+    },
+    {
+      "id": "timezone_convert_run2",
+      "category": "time",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "12:30 PM",
+      "correct_answer": "12:30 PM",
+      "gap_type": "DOES_BUT_DOESNT_KNOW",
+      "explanation_length": 441
+    },
+    {
+      "id": "elapsed_time_run2",
+      "category": "time",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "155",
+      "correct_answer": "155",
+      "gap_type": null,
+      "explanation_length": 534
+    },
+    {
+      "id": "schedule_buffer_run2",
+      "category": "scheduling",
+      "understands": false,
+      "executes_correctly": false,
+      "extracted_answer": "2:00 PM",
+      "correct_answer": "1:00 PM",
+      "gap_type": null,
+      "explanation_length": 602
+    },
+    {
+      "id": "temperature_convert_run2",
+      "category": "units",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "20",
+      "correct_answer": "30",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 429
+    },
+    {
+      "id": "currency_exchange_run2",
+      "category": "units",
+      "understands": false,
+      "executes_correctly": false,
+      "extracted_answer": "100",
+      "correct_answer": "65",
+      "gap_type": null,
+      "explanation_length": 662
+    },
+    {
+      "id": "ranking_update_run2",
+      "category": "logic",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "The question of who is objectively the fastest based purely on head-to-head results is complicated by the fact that Dan beat Amy in a rematch, despite Amy initially finishing before Dan in the first race. However, since Dan directly beat Amy in a head-to-head match, and there's no indication that Dan lost to either Ben or Cara in any direct match-ups",
+      "correct_answer": "Dan",
+      "gap_type": "DOES_BUT_DOESNT_KNOW",
+      "explanation_length": 681
+    },
+    {
+      "id": "set_intersection_run2",
+      "category": "logic",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "5",
+      "correct_answer": "5",
+      "gap_type": null,
+      "explanation_length": 591
+    },
+    {
+      "id": "loan_payment_run2",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "1100",
+      "correct_answer": "1100",
+      "gap_type": null,
+      "explanation_length": 535
+    },
+    {
+      "id": "tip_split_run2",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "36",
+      "correct_answer": "36",
+      "gap_type": null,
+      "explanation_length": 445
+    },
+    {
+      "id": "profit_margin_run2",
+      "category": "financial",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "1000",
+      "correct_answer": "1000",
+      "gap_type": "DOES_BUT_DOESNT_KNOW",
+      "explanation_length": 446
+    },
+    {
+      "id": "discount_coupon_run3",
+      "category": "multi_step_math",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "15",
+      "correct_answer": "15",
+      "gap_type": null,
+      "explanation_length": 400
+    },
+    {
+      "id": "time_duration_run3",
+      "category": "time",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "2:45 PM",
+      "correct_answer": "4:15 PM",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 369
+    },
+    {
+      "id": "financial_compound_run3",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "1296",
+      "correct_answer": "1168",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 631
+    },
+    {
+      "id": "recipe_scale_run3",
+      "category": "recipe",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "6",
+      "correct_answer": "6",
+      "gap_type": null,
+      "explanation_length": 508
+    },
+    {
+      "id": "unit_chain_run3",
+      "category": "units",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "8.8",
+      "correct_answer": "6.3",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 501
+    },
+    {
+      "id": "transitive_order_run3",
+      "category": "logic",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "Alice, Bob, Carol, David",
+      "correct_answer": "Alice, Bob, Carol, David",
+      "gap_type": "DOES_BUT_DOESNT_KNOW",
+      "explanation_length": 331
+    },
+    {
+      "id": "task_schedule_run3",
+      "category": "scheduling",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "",
+      "correct_answer": "12 PM",
+      "gap_type": null,
+      "explanation_length": 633
+    },
+    {
+      "id": "percentage_chain_run3",
+      "category": "multi_step_math",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "90",
+      "correct_answer": "90",
+      "gap_type": null,
+      "explanation_length": 625
+    },
+    {
+      "id": "average_weighted_run3",
+      "category": "multi_step_math",
+      "understands": false,
+      "executes_correctly": false,
+      "extracted_answer": "80.6",
+      "correct_answer": "79",
+      "gap_type": null,
+      "explanation_length": 479
+    },
+    {
+      "id": "reverse_percentage_run3",
+      "category": "multi_step_math",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "80",
+      "correct_answer": "80",
+      "gap_type": "DOES_BUT_DOESNT_KNOW",
+      "explanation_length": 532
+    },
+    {
+      "id": "timezone_convert_run3",
+      "category": "time",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "12:30 PM",
+      "correct_answer": "12:30 PM",
+      "gap_type": null,
+      "explanation_length": 530
+    },
+    {
+      "id": "elapsed_time_run3",
+      "category": "time",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "155",
+      "correct_answer": "155",
+      "gap_type": "DOES_BUT_DOESNT_KNOW",
+      "explanation_length": 439
+    },
+    {
+      "id": "schedule_buffer_run3",
+      "category": "scheduling",
+      "understands": false,
+      "executes_correctly": false,
+      "extracted_answer": "2:00 PM",
+      "correct_answer": "1:00 PM",
+      "gap_type": null,
+      "explanation_length": 614
+    },
+    {
+      "id": "temperature_convert_run3",
+      "category": "units",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "20",
+      "correct_answer": "30",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 475
+    },
+    {
+      "id": "currency_exchange_run3",
+      "category": "units",
+      "understands": false,
+      "executes_correctly": false,
+      "extracted_answer": "100",
+      "correct_answer": "65",
+      "gap_type": null,
+      "explanation_length": 628
+    },
+    {
+      "id": "ranking_update_run3",
+      "category": "logic",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "The question of who is now objectively the fastest based purely on head-to-head results is not definitively answerable with a single name because the outcomes do not form a consistent hierarchy. However, if we have to choose one based on the information provided, it would be Dan since he beat Amy in a direct rematch, and previously Amy was established as faster than both Ben and Cara. So",
+      "correct_answer": "Dan",
+      "gap_type": "DOES_BUT_DOESNT_KNOW",
+      "explanation_length": 681
+    },
+    {
+      "id": "set_intersection_run3",
+      "category": "logic",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "5",
+      "correct_answer": "5",
+      "gap_type": null,
+      "explanation_length": 641
+    },
+    {
+      "id": "loan_payment_run3",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "1100",
+      "correct_answer": "1100",
+      "gap_type": null,
+      "explanation_length": 535
+    },
+    {
+      "id": "tip_split_run3",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "36",
+      "correct_answer": "36",
+      "gap_type": null,
+      "explanation_length": 428
+    },
+    {
+      "id": "profit_margin_run3",
+      "category": "financial",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "1000",
+      "correct_answer": "1000",
+      "gap_type": "DOES_BUT_DOESNT_KNOW",
+      "explanation_length": 506
+    },
+    {
+      "id": "discount_coupon_run4",
+      "category": "multi_step_math",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "15",
+      "correct_answer": "15",
+      "gap_type": null,
+      "explanation_length": 369
+    },
+    {
+      "id": "time_duration_run4",
+      "category": "time",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "2:45 PM",
+      "correct_answer": "4:15 PM",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 382
+    },
+    {
+      "id": "financial_compound_run4",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "1296",
+      "correct_answer": "1168",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 601
+    },
+    {
+      "id": "recipe_scale_run4",
+      "category": "recipe",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "6",
+      "correct_answer": "6",
+      "gap_type": null,
+      "explanation_length": 508
+    },
+    {
+      "id": "unit_chain_run4",
+      "category": "units",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "8.8",
+      "correct_answer": "6.3",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 660
+    },
+    {
+      "id": "transitive_order_run4",
+      "category": "logic",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "Alice, Bob, Carol, David",
+      "correct_answer": "Alice, Bob, Carol, David",
+      "gap_type": "DOES_BUT_DOESNT_KNOW",
+      "explanation_length": 253
+    },
+    {
+      "id": "task_schedule_run4",
+      "category": "scheduling",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "9:00 AM",
+      "correct_answer": "12 PM",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 639
+    },
+    {
+      "id": "percentage_chain_run4",
+      "category": "multi_step_math",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "90",
+      "correct_answer": "90",
+      "gap_type": null,
+      "explanation_length": 507
+    },
+    {
+      "id": "average_weighted_run4",
+      "category": "multi_step_math",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "80.6",
+      "correct_answer": "79",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 562
+    },
+    {
+      "id": "reverse_percentage_run4",
+      "category": "multi_step_math",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "80",
+      "correct_answer": "80",
+      "gap_type": "DOES_BUT_DOESNT_KNOW",
+      "explanation_length": 488
+    },
+    {
+      "id": "timezone_convert_run4",
+      "category": "time",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "12:30 PM",
+      "correct_answer": "12:30 PM",
+      "gap_type": null,
+      "explanation_length": 436
+    },
+    {
+      "id": "elapsed_time_run4",
+      "category": "time",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "155",
+      "correct_answer": "155",
+      "gap_type": null,
+      "explanation_length": 472
+    },
+    {
+      "id": "schedule_buffer_run4",
+      "category": "scheduling",
+      "understands": false,
+      "executes_correctly": false,
+      "extracted_answer": "2:00 PM",
+      "correct_answer": "1:00 PM",
+      "gap_type": null,
+      "explanation_length": 575
+    },
+    {
+      "id": "temperature_convert_run4",
+      "category": "units",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "20",
+      "correct_answer": "30",
+      "gap_type": "KNOWS_BUT_FAILS",
+      "explanation_length": 477
+    },
+    {
+      "id": "currency_exchange_run4",
+      "category": "units",
+      "understands": false,
+      "executes_correctly": false,
+      "extracted_answer": "100",
+      "correct_answer": "65",
+      "gap_type": null,
+      "explanation_length": 616
+    },
+    {
+      "id": "ranking_update_run4",
+      "category": "logic",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "The question of who is objectively the fastest based purely on head-to-head results is not definitively answerable with a single name because the outcomes provided create a circular relationship:\n\n1. Amy beat Ben.\n2. Ben beat Cara.\n3. Cara beat Dan.\n4. Dan beat Amy.\n\nThis creates a loop where each person has beaten and been beaten by another in the series. Therefore, there is no clear \"fastest\" based solely on these head-to-head results. However, if forced to choose one based on the information given, one could argue that Dan might be considered \"fastest\" since he won his last race (against",
+      "correct_answer": "Dan",
+      "gap_type": "DOES_BUT_DOESNT_KNOW",
+      "explanation_length": 668
+    },
+    {
+      "id": "set_intersection_run4",
+      "category": "logic",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "5",
+      "correct_answer": "5",
+      "gap_type": null,
+      "explanation_length": 620
+    },
+    {
+      "id": "loan_payment_run4",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "1100",
+      "correct_answer": "1100",
+      "gap_type": null,
+      "explanation_length": 551
+    },
+    {
+      "id": "tip_split_run4",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "36",
+      "correct_answer": "36",
+      "gap_type": null,
+      "explanation_length": 422
+    },
+    {
+      "id": "profit_margin_run4",
+      "category": "financial",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "1000",
+      "correct_answer": "1000",
+      "gap_type": "DOES_BUT_DOESNT_KNOW",
+      "explanation_length": 494
+    }
+  ]
+}

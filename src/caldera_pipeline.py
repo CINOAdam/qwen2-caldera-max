@@ -275,6 +275,17 @@ def compress_model(config: dict) -> None:
     pattern_overrides = caldera_cfg.get("pattern_overrides", {})
 
     modules = _iter_target_modules(model, target_suffixes)
+
+    # Support late-layer-first ordering for de-risking storage failures
+    layer_order = caldera_cfg.get("layer_order", "default")
+    if layer_order == "late-first":
+        import re
+        def _extract_layer_num(name: str) -> int:
+            match = re.search(r"layers\.(\d+)\.", name)
+            return int(match.group(1)) if match else -1
+        modules = sorted(modules, key=lambda x: _extract_layer_num(x[0]), reverse=True)
+        print(f"[caldera] using late-layer-first ordering")
+
     max_modules = caldera_cfg.get("max_modules")
     if max_modules:
         modules = modules[: int(max_modules)]
@@ -291,6 +302,12 @@ def compress_model(config: dict) -> None:
         layer_cfg = _layer_overrides(name, caldera_cfg, layer_overrides, pattern_overrides)
         if layer_cfg.get("skip", False):
             print(f"[caldera] skipping {name} (override)")
+            continue
+        # Resume: skip if already compressed
+        layer_path = output_dir / "layers" / f"{name.replace('.', '_')}.pt"
+        if layer_path.exists():
+            print(f"[caldera] skipping {name} (already done)")
+            stats["compressed_layers"].append({"name": name, "status": "skipped"})
             continue
         print(f"[caldera] compressing {name}")
         calibration_samples = int(layer_cfg.get("calibration_samples", 1024))

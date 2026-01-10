@@ -1,0 +1,42 @@
+name: goodhart-n100-experiment
+cloud_type: COMMUNITY
+compute_type: GPU
+interruptible: false
+
+gpu_type_priority: custom
+gpu_type_ids:
+  - NVIDIA A100-SXM4-80GB
+  - NVIDIA A100 80GB PCIe
+  - NVIDIA H100 80GB HBM3
+  - NVIDIA H100 NVL
+
+gpu_count: 2  # Need 2x 80GB for Qwen2-72B
+min_vcpu_per_gpu: 8
+min_ram_per_gpu: 64
+support_public_ip: true
+
+image_name: runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04
+
+volume_in_gb: 1000
+container_disk_in_gb: 100
+volume_mount_path: /workspace
+
+ports:
+  - 22/tcp
+  - 8888/http
+
+env:
+  HF_TOKEN: ${HF_TOKEN}
+  PUBLIC_KEY: ${PUBLIC_KEY}
+  AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+  AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+  AWS_DEFAULT_REGION: us-east-1
+
+docker_start_cmd:
+  - /bin/bash
+  - -lc
+  - >-
+      mkdir -p /root/.ssh &&
+      echo "${PUBLIC_KEY}" >> /root/.ssh/authorized_keys &&
+      chmod 700 -R /root/.ssh &&
+      exec /start.sh

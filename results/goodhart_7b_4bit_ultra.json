@@ -1,0 +1,117 @@
+{
+  "model_id": "Qwen/Qwen2-7B-Instruct",
+  "caldera_dir": "artifacts/qwen2-7b/caldera-4bit-ultra",
+  "summary": {
+    "total": 7,
+    "understands": 5,
+    "executes": 2,
+    "gaps": 3,
+    "gap_ids": [
+      "discount_coupon",
+      "financial_compound",
+      "unit_chain"
+    ],
+    "by_category": {
+      "multi_step_math": {
+        "pass": 0,
+        "fail": 1,
+        "gap": 1
+      },
+      "time": {
+        "pass": 1,
+        "fail": 0,
+        "gap": 0
+      },
+      "financial": {
+        "pass": 0,
+        "fail": 1,
+        "gap": 1
+      },
+      "recipe": {
+        "pass": 0,
+        "fail": 1,
+        "gap": 0
+      },
+      "units": {
+        "pass": 0,
+        "fail": 1,
+        "gap": 1
+      },
+      "logic": {
+        "pass": 0,
+        "fail": 1,
+        "gap": 0
+      },
+      "scheduling": {
+        "pass": 1,
+        "fail": 0,
+        "gap": 0
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "discount_coupon",
+      "category": "multi_step_math",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "21",
+      "correct_answer": "15",
+      "gap_type": "KNOWS_BUT_FAILS"
+    },
+    {
+      "id": "time_duration",
+      "category": "time",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "4:15 PM",
+      "correct_answer": "4:15 PM",
+      "gap_type": null
+    },
+    {
+      "id": "financial_compound",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "864",
+      "correct_answer": "1168",
+      "gap_type": "KNOWS_BUT_FAILS"
+    },
+    {
+      "id": "recipe_scale",
+      "category": "recipe",
+      "understands": false,
+      "executes_correctly": false,
+      "extracted_answer": "3",
+      "correct_answer": "6",
+      "gap_type": null
+    },
+    {
+      "id": "unit_chain",
+      "category": "units",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "5.8",
+      "correct_answer": "6.3",
+      "gap_type": "KNOWS_BUT_FAILS"
+    },
+    {
+      "id": "transitive_order",
+      "category": "logic",
+      "understands": false,
+      "executes_correctly": false,
+      "extracted_answer": "Alice, Bob, David, Carol",
+      "correct_answer": "Alice, Bob, Carol, David",
+      "gap_type": null
+    },
+    {
+      "id": "task_schedule",
+      "category": "scheduling",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "Task A starts at 9 AM and takes 2 hours, finishing at 11 AM.\n\nTask B must start after Task A finishes, so it begins at 11 AM and ends at noon.\n\nTask C can run simultaneously with Tasks A and B, starting at 9 AM and finishing at 12 PM.\n\nTherefore",
+      "correct_answer": "12 PM",
+      "gap_type": null
+    }
+  ]
+}

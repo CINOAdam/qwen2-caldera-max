@@ -1,0 +1,115 @@
+{
+  "model_id": "Qwen/Qwen2-7B-Instruct",
+  "caldera_dir": "artifacts/qwen2-7b/caldera-3bit-ultra",
+  "summary": {
+    "total": 7,
+    "understands": 4,
+    "executes": 4,
+    "gaps": 1,
+    "gap_ids": [
+      "time_duration"
+    ],
+    "by_category": {
+      "multi_step_math": {
+        "pass": 0,
+        "fail": 1,
+        "gap": 0
+      },
+      "time": {
+        "pass": 0,
+        "fail": 1,
+        "gap": 1
+      },
+      "financial": {
+        "pass": 1,
+        "fail": 0,
+        "gap": 0
+      },
+      "recipe": {
+        "pass": 0,
+        "fail": 1,
+        "gap": 0
+      },
+      "units": {
+        "pass": 1,
+        "fail": 0,
+        "gap": 0
+      },
+      "logic": {
+        "pass": 1,
+        "fail": 0,
+        "gap": 0
+      },
+      "scheduling": {
+        "pass": 1,
+        "fail": 0,
+        "gap": 0
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "discount_coupon",
+      "category": "multi_step_math",
+      "understands": false,
+      "executes_correctly": false,
+      "extracted_answer": "20",
+      "correct_answer": "15",
+      "gap_type": null
+    },
+    {
+      "id": "time_duration",
+      "category": "time",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "The meeting ends at \\(:') PM format",
+      "correct_answer": "4:15 PM",
+      "gap_type": "KNOWS_BUT_FAILS"
+    },
+    {
+      "id": "financial_compound",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "",
+      "correct_answer": "1168",
+      "gap_type": null
+    },
+    {
+      "id": "recipe_scale",
+      "category": "recipe",
+      "understands": false,
+      "executes_correctly": false,
+      "extracted_answer": "\u82e5\u60a8\u9700\u8981\u7684\u662f\u4e00\u822c\u56de\u7b54\uff0c\u8bf7\u63d0\u4f9b\u4ee5\u4e0b\u4fe1\u606f\uff1a\n\n\u82e5\u539f\u672c\u914d\u65b9\u4e3a\u56db\u4efd\u9700\u8981\u4f7f\u7528\u4e24\u676f\u9762\u7c89\u3002\\n \u82e5\u8981\u4e3a\u516d\u4eba\u670d\u52a1\uff0c\u5219",
+      "correct_answer": "6",
+      "gap_type": null
+    },
+    {
+      "id": "unit_chain",
+      "category": "units",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "",
+      "correct_answer": "6.3",
+      "gap_type": null
+    },
+    {
+      "id": "transitive_order",
+      "category": "logic",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "Alice",
+      "correct_answer": "Alice, Bob, Carol, David",
+      "gap_type": "DOES_BUT_DOESNT_KNOW"
+    },
+    {
+      "id": "task_schedule",
+      "category": "scheduling",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "",
+      "correct_answer": "12 PM",
+      "gap_type": null
+    }
+  ]
+}

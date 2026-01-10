@@ -1,0 +1,237 @@
+{
+  "model_id": "Qwen/Qwen2-72B-Instruct",
+  "caldera_dir": null,
+  "summary": {
+    "total": 20,
+    "understands": 15,
+    "executes": 13,
+    "gaps": 6,
+    "gap_ids": [
+      "time_duration",
+      "financial_compound",
+      "unit_chain",
+      "average_weighted",
+      "schedule_buffer",
+      "temperature_convert"
+    ],
+    "by_category": {
+      "multi_step_math": {
+        "pass": 3,
+        "fail": 1,
+        "gap": 1
+      },
+      "time": {
+        "pass": 2,
+        "fail": 1,
+        "gap": 1
+      },
+      "financial": {
+        "pass": 3,
+        "fail": 1,
+        "gap": 1
+      },
+      "recipe": {
+        "pass": 1,
+        "fail": 0,
+        "gap": 0
+      },
+      "units": {
+        "pass": 0,
+        "fail": 3,
+        "gap": 2
+      },
+      "logic": {
+        "pass": 3,
+        "fail": 0,
+        "gap": 0
+      },
+      "scheduling": {
+        "pass": 1,
+        "fail": 1,
+        "gap": 1
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "discount_coupon",
+      "category": "multi_step_math",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "15",
+      "correct_answer": "15",
+      "gap_type": null
+    },
+    {
+      "id": "time_duration",
+      "category": "time",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "2:45 PM",
+      "correct_answer": "4:15 PM",
+      "gap_type": "KNOWS_BUT_FAILS"
+    },
+    {
+      "id": "financial_compound",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "1080",
+      "correct_answer": "1168",
+      "gap_type": "KNOWS_BUT_FAILS"
+    },
+    {
+      "id": "recipe_scale",
+      "category": "recipe",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "6",
+      "correct_answer": "6",
+      "gap_type": null
+    },
+    {
+      "id": "unit_chain",
+      "category": "units",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "8.7",
+      "correct_answer": "6.3",
+      "gap_type": "KNOWS_BUT_FAILS"
+    },
+    {
+      "id": "transitive_order",
+      "category": "logic",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "Alice, Bob, Carol, David",
+      "correct_answer": "Alice, Bob, Carol, David",
+      "gap_type": "DOES_BUT_DOESNT_KNOW"
+    },
+    {
+      "id": "task_schedule",
+      "category": "scheduling",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "Let's break down the tasks based on their requirements:\n\n- Task A starts at 9 AM and takes 2 hours, so it will finish at 11 AM.\n- Task B starts after Task A finishes (at 11 AM) and takes 1 hour, so it will finish at 12 PM.\n- Task C can run parallel to A and B, meaning it can start at 9 AM as well. Since it takes 3 hours",
+      "correct_answer": "12 PM",
+      "gap_type": null
+    },
+    {
+      "id": "percentage_chain",
+      "category": "multi_step_math",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "90",
+      "correct_answer": "90",
+      "gap_type": null
+    },
+    {
+      "id": "average_weighted",
+      "category": "multi_step_math",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "80.6",
+      "correct_answer": "79",
+      "gap_type": "KNOWS_BUT_FAILS"
+    },
+    {
+      "id": "reverse_percentage",
+      "category": "multi_step_math",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "80",
+      "correct_answer": "80",
+      "gap_type": "DOES_BUT_DOESNT_KNOW"
+    },
+    {
+      "id": "timezone_convert",
+      "category": "time",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "12:30 PM",
+      "correct_answer": "12:30 PM",
+      "gap_type": null
+    },
+    {
+      "id": "elapsed_time",
+      "category": "time",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "155",
+      "correct_answer": "155",
+      "gap_type": "DOES_BUT_DOESNT_KNOW"
+    },
+    {
+      "id": "schedule_buffer",
+      "category": "scheduling",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "2:00 PM",
+      "correct_answer": "1:00 PM",
+      "gap_type": "KNOWS_BUT_FAILS"
+    },
+    {
+      "id": "temperature_convert",
+      "category": "units",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "20",
+      "correct_answer": "30",
+      "gap_type": "KNOWS_BUT_FAILS"
+    },
+    {
+      "id": "currency_exchange",
+      "category": "units",
+      "understands": false,
+      "executes_correctly": false,
+      "extracted_answer": "88",
+      "correct_answer": "65",
+      "gap_type": null
+    },
+    {
+      "id": "ranking_update",
+      "category": "logic",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "The information provided does not allow for a definitive answer to who is now objectively the fastest based solely on head-to-head results. However, based on the given data:\n\n1. Amy finished before Ben, Cara, and Dan initially.\n2. Ben finished before Cara and Dan.\n3. Cara finished before Dan.\n4. In a rematch",
+      "correct_answer": "Dan",
+      "gap_type": "DOES_BUT_DOESNT_KNOW"
+    },
+    {
+      "id": "set_intersection",
+      "category": "logic",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "5",
+      "correct_answer": "5",
+      "gap_type": null
+    },
+    {
+      "id": "loan_payment",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "1100",
+      "correct_answer": "1100",
+      "gap_type": null
+    },
+    {
+      "id": "tip_split",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "36",
+      "correct_answer": "36",
+      "gap_type": null
+    },
+    {
+      "id": "profit_margin",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "1000",
+      "correct_answer": "1000",
+      "gap_type": null
+    }
+  ]
+}

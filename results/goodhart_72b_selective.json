@@ -1,0 +1,117 @@
+{
+  "model_id": "Qwen/Qwen2-72B-Instruct",
+  "caldera_dir": "artifacts/qwen2-72b/caldera-3bit-selective",
+  "summary": {
+    "total": 7,
+    "understands": 5,
+    "executes": 3,
+    "gaps": 3,
+    "gap_ids": [
+      "discount_coupon",
+      "financial_compound",
+      "task_schedule"
+    ],
+    "by_category": {
+      "multi_step_math": {
+        "pass": 0,
+        "fail": 1,
+        "gap": 1
+      },
+      "time": {
+        "pass": 1,
+        "fail": 0,
+        "gap": 0
+      },
+      "financial": {
+        "pass": 0,
+        "fail": 1,
+        "gap": 1
+      },
+      "recipe": {
+        "pass": 1,
+        "fail": 0,
+        "gap": 0
+      },
+      "units": {
+        "pass": 0,
+        "fail": 1,
+        "gap": 0
+      },
+      "logic": {
+        "pass": 1,
+        "fail": 0,
+        "gap": 0
+      },
+      "scheduling": {
+        "pass": 0,
+        "fail": 1,
+        "gap": 1
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "discount_coupon",
+      "category": "multi_step_math",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "19.5",
+      "correct_answer": "15",
+      "gap_type": "KNOWS_BUT_FAILS"
+    },
+    {
+      "id": "time_duration",
+      "category": "time",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "4:15 PM",
+      "correct_answer": "4:15 PM",
+      "gap_type": null
+    },
+    {
+      "id": "financial_compound",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "1080",
+      "correct_answer": "1168",
+      "gap_type": "KNOWS_BUT_FAILS"
+    },
+    {
+      "id": "recipe_scale",
+      "category": "recipe",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "6\n\nIf a recipe that serves 4 uses 2 cups of flour, doubling that recipe would require 4 cups of flour for 8 servings. However, you want to make 6 servings which is 1.5 times the original recipe. So, for 6 servings",
+      "correct_answer": "6",
+      "gap_type": null
+    },
+    {
+      "id": "unit_chain",
+      "category": "units",
+      "understands": false,
+      "executes_correctly": false,
+      "extracted_answer": "8.7",
+      "correct_answer": "6.3",
+      "gap_type": null
+    },
+    {
+      "id": "transitive_order",
+      "category": "logic",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "Alice, Bob, Carol, David. Since Alice is taller than Bob",
+      "correct_answer": "Alice, Bob, Carol, David",
+      "gap_type": "DOES_BUT_DOESNT_KNOW"
+    },
+    {
+      "id": "task_schedule",
+      "category": "scheduling",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "To solve this problem, let's break it down step by step:\n\n- Task A starts at 9 AM and takes 2 hours, so it finishes at 11 AM.\n- Task B can only start after Task A finishes, which is at 11 AM. Since Task B takes 1 hour",
+      "correct_answer": "12 PM",
+      "gap_type": "KNOWS_BUT_FAILS"
+    }
+  ]
+}

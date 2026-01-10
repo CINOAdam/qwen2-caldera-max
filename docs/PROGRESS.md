@@ -268,3 +268,17 @@ PYTHONPATH=. python scripts/mixkvq_generate.py \
   * MMLU: baseline=73.3%, 3bit-uniform=67.3%, 3bit-ultra=70.0% (ultra +2.7pp)
   * computer_security: uniform=84%, ultra=90% (+6pp from protecting late layers)
   Updated `docs/phase0_validation_report.md` with 72B results section.
+- 2026-01-05: **CRITICAL BUG FOUND AND FIXED** - 72B compression was producing gibberish
+  because artifacts were trained on a completely different model (correlation = -0.013).
+  Root cause: Old artifacts in `caldera-selective-v2-packed/` were incompatible with
+  Qwen2-72B-Instruct. Regenerated all 560 layer artifacts from scratch (~1 hour on 2x A100).
+  New artifacts validated: correlation = 0.964, single-layer replacement produces correct output.
+- 2026-01-05: Completed Goodhart Gap evaluation for 72B with new artifacts:
+  * Baseline: Understanding 6/7 (86%), Execution 3/7 (43%), Gap 4/7
+  * Uniform 3-bit CALDERA: Understanding 5/7 (71%), Execution 2/7 (29%), Gap 5/7
+  * Selective 3-bit (protect 70-79): Understanding 5/7 (71%), Execution 3/7 (43%), Gap 3/7
+  Key findings:
+  - Selective compression MATCHES baseline execution (43%)
+  - Selective has FEWER Goodhart Gaps than baseline (3/7 vs 4/7)
+  - Uniform worsens execution (29% vs 43%), selective preserves it
+  - Confirms 7B pattern: protecting late layers preserves multi-step reasoning

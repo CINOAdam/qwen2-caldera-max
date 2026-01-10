@@ -62,7 +62,11 @@ class CalderaLinear(nn.Module):
         chunk_size: int | None = 1024,
     ) -> None:
         super().__init__()
-        self.in_features = q_weight.values.shape[1]
+        # Use packed_cols for in_features when data is packed, otherwise use shape
+        if q_weight.packed_cols is not None:
+            self.in_features = q_weight.packed_cols
+        else:
+            self.in_features = q_weight.values.shape[1]
         self.out_features = q_weight.values.shape[0]
         self.group_size = q_weight.group_size
         if cache_mode is None:

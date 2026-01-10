@@ -1,0 +1,56 @@
+# 4-bit selective compression for Qwen2-72B
+# Protects late layers (70-79) - only generates artifacts for layers 0-69
+
+model_id: Qwen/Qwen2-72B-Instruct
+output_dir: artifacts/qwen2-72b/caldera-4bit-selective
+
+calibration:
+  datasets:
+    - name: c4
+      weight: 1.0
+  samples: 512
+  sequence_length: 512
+  progress_every: 100
+
+caldera:
+  bq: 4
+  bl: 4
+  br: 4
+  rank: 64
+  group_size: 128
+  calibration_batch_size: 1
+  calibration_samples: 512
+  use_calibration: false
+  ridge_lambda: 1.0
+  compute_device: cuda
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+  # Skip protected layers entirely - no artifacts generated
+  skip_layers:
+    - "model.layers.70.*"
+    - "model.layers.71.*"
+    - "model.layers.72.*"
+    - "model.layers.73.*"
+    - "model.layers.74.*"
+    - "model.layers.75.*"
+    - "model.layers.76.*"
+    - "model.layers.77.*"
+    - "model.layers.78.*"
+    - "model.layers.79.*"
+
+  layer_order: late-first  # Compress 69 down to 0
+
+  use_rht: false
+  lora_finetune: false
+
+runtime:
+  dtype: bf16
+  device: cuda
+  device_map: auto

@@ -1,0 +1,119 @@
+{
+  "model_id": "Qwen/Qwen2-72B-Instruct",
+  "caldera_dir": "artifacts/qwen2-72b/caldera-3bit-uniform-fresh",
+  "summary": {
+    "total": 7,
+    "understands": 5,
+    "executes": 2,
+    "gaps": 5,
+    "gap_ids": [
+      "discount_coupon",
+      "time_duration",
+      "financial_compound",
+      "unit_chain",
+      "task_schedule"
+    ],
+    "by_category": {
+      "multi_step_math": {
+        "pass": 0,
+        "fail": 1,
+        "gap": 1
+      },
+      "time": {
+        "pass": 0,
+        "fail": 1,
+        "gap": 1
+      },
+      "financial": {
+        "pass": 0,
+        "fail": 1,
+        "gap": 1
+      },
+      "recipe": {
+        "pass": 1,
+        "fail": 0,
+        "gap": 0
+      },
+      "units": {
+        "pass": 0,
+        "fail": 1,
+        "gap": 1
+      },
+      "logic": {
+        "pass": 1,
+        "fail": 0,
+        "gap": 0
+      },
+      "scheduling": {
+        "pass": 0,
+        "fail": 1,
+        "gap": 1
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "discount_coupon",
+      "category": "multi_step_math",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "19",
+      "correct_answer": "15",
+      "gap_type": "KNOWS_BUT_FAILS"
+    },
+    {
+      "id": "time_duration",
+      "category": "time",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "2:45 PM",
+      "correct_answer": "4:15 PM",
+      "gap_type": "KNOWS_BUT_FAILS"
+    },
+    {
+      "id": "financial_compound",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "1080",
+      "correct_answer": "1168",
+      "gap_type": "KNOWS_BUT_FAILS"
+    },
+    {
+      "id": "recipe_scale",
+      "category": "recipe",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "6",
+      "correct_answer": "6",
+      "gap_type": "DOES_BUT_DOESNT_KNOW"
+    },
+    {
+      "id": "unit_chain",
+      "category": "units",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "8.7",
+      "correct_answer": "6.3",
+      "gap_type": "KNOWS_BUT_FAILS"
+    },
+    {
+      "id": "transitive_order",
+      "category": "logic",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "Alice, Bob, Carol, David",
+      "correct_answer": "Alice, Bob, Carol, David",
+      "gap_type": "DOES_BUT_DOESNT_KNOW"
+    },
+    {
+      "id": "task_schedule",
+      "category": "scheduling",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "To solve this scheduling problem:\n\nTask A starts at 9 AM and takes 2 hours \u2192 Finishes at 11 AM.\n\nTask C starts simultaneously with Task A since it can run parallel tasks. Task C takes 3 hours.\n\nSince Task B requires Task A completion before starting:\n\nTask B starts immediately after Task A finishes \u2192 Starts at 11 AM.\n\nTask B takes another hour \u2192 Finishes at noon.\n\nHowever, Task C started earlier alongside Task A and continues running while Task B runs.\n\nThus, Task C finishes \u2192 Ends at \u2193\n\nTask C started at \u2193 9 AM + Task Duration \u2193 Ends at \u2193 Task",
+      "correct_answer": "12 PM",
+      "gap_type": "KNOWS_BUT_FAILS"
+    }
+  ]
+}

@@ -1,0 +1,237 @@
+{
+  "model_id": "Qwen/Qwen2-72B-Instruct",
+  "caldera_dir": "artifacts/qwen2-72b/caldera-4bit-selective-fixed",
+  "summary": {
+    "total": 20,
+    "understands": 12,
+    "executes": 13,
+    "gaps": 5,
+    "gap_rate_conditional": 0.417,
+    "gap_ids": [
+      "time_duration",
+      "financial_compound",
+      "average_weighted",
+      "schedule_buffer",
+      "temperature_convert"
+    ],
+    "by_category": {
+      "multi_step_math": {
+        "pass": 3,
+        "fail": 1,
+        "gap": 1
+      },
+      "time": {
+        "pass": 2,
+        "fail": 1,
+        "gap": 1
+      },
+      "financial": {
+        "pass": 3,
+        "fail": 1,
+        "gap": 1
+      },
+      "recipe": {
+        "pass": 1,
+        "fail": 0,
+        "gap": 0
+      },
+      "units": {
+        "pass": 0,
+        "fail": 3,
+        "gap": 1
+      },
+      "logic": {
+        "pass": 3,
+        "fail": 0,
+        "gap": 0
+      },
+      "scheduling": {
+        "pass": 1,
+        "fail": 1,
+        "gap": 1
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "discount_coupon",
+      "category": "multi_step_math",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "15",
+      "correct_answer": "15",
+      "gap_type": null
+    },
+    {
+      "id": "time_duration",
+      "category": "time",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "2:45 PM",
+      "correct_answer": "4:15 PM",
+      "gap_type": "KNOWS_BUT_FAILS"
+    },
+    {
+      "id": "financial_compound",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "1296",
+      "correct_answer": "1168",
+      "gap_type": "KNOWS_BUT_FAILS"
+    },
+    {
+      "id": "recipe_scale",
+      "category": "recipe",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "6",
+      "correct_answer": "6",
+      "gap_type": null
+    },
+    {
+      "id": "unit_chain",
+      "category": "units",
+      "understands": false,
+      "executes_correctly": false,
+      "extracted_answer": "8.8",
+      "correct_answer": "6.3",
+      "gap_type": null
+    },
+    {
+      "id": "transitive_order",
+      "category": "logic",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "Alice, Bob, Carol, David",
+      "correct_answer": "Alice, Bob, Carol, David",
+      "gap_type": "DOES_BUT_DOESNT_KNOW"
+    },
+    {
+      "id": "task_schedule",
+      "category": "scheduling",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "To solve this problem, let's break down the tasks based on their requirements:\n\n- Task A takes 2 hours.\n- Task B takes 1 hour and must start after A finishes.\n- Task C takes 3 hours and can run parallel to A and B.\n\nSince all tasks can start at 9 AM, we will start them as follows:\n\n- Task A starts at 9 AM and finishes at 11 AM.\n- Task C also starts at 9 AM since it can run parallel to A. Since it takes 3 hours, it will finish at 12 PM.\n- Task B cannot start until A is",
+      "correct_answer": "12 PM",
+      "gap_type": null
+    },
+    {
+      "id": "percentage_chain",
+      "category": "multi_step_math",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "90",
+      "correct_answer": "90",
+      "gap_type": "DOES_BUT_DOESNT_KNOW"
+    },
+    {
+      "id": "average_weighted",
+      "category": "multi_step_math",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "80.6",
+      "correct_answer": "79",
+      "gap_type": "KNOWS_BUT_FAILS"
+    },
+    {
+      "id": "reverse_percentage",
+      "category": "multi_step_math",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "80",
+      "correct_answer": "80",
+      "gap_type": "DOES_BUT_DOESNT_KNOW"
+    },
+    {
+      "id": "timezone_convert",
+      "category": "time",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "12:30 PM",
+      "correct_answer": "12:30 PM",
+      "gap_type": "DOES_BUT_DOESNT_KNOW"
+    },
+    {
+      "id": "elapsed_time",
+      "category": "time",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "155",
+      "correct_answer": "155",
+      "gap_type": null
+    },
+    {
+      "id": "schedule_buffer",
+      "category": "scheduling",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "2:00 PM",
+      "correct_answer": "1:00 PM",
+      "gap_type": "KNOWS_BUT_FAILS"
+    },
+    {
+      "id": "temperature_convert",
+      "category": "units",
+      "understands": true,
+      "executes_correctly": false,
+      "extracted_answer": "20",
+      "correct_answer": "30",
+      "gap_type": "KNOWS_BUT_FAILS"
+    },
+    {
+      "id": "currency_exchange",
+      "category": "units",
+      "understands": false,
+      "executes_correctly": false,
+      "extracted_answer": "100",
+      "correct_answer": "65",
+      "gap_type": null
+    },
+    {
+      "id": "ranking_update",
+      "category": "logic",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "The question of who is now objectively the fastest based purely on head-to-head results is not definitively answerable with a single name because the information provided creates a loop in the rankings:\n\n1. Amy beat Ben.\n2. Ben beat Cara.\n3. Cara beat Dan.\n4. Dan beat Amy.\n\nThis creates a circular relationship where each person has beaten someone and been beaten by someone else in the group, except for the fact that Dan has now also beaten Amy, which complicates the initial linear ranking. Therefore, there is no clear \"fastest\" based solely on these head-to-head results. However",
+      "correct_answer": "Dan",
+      "gap_type": "DOES_BUT_DOESNT_KNOW"
+    },
+    {
+      "id": "set_intersection",
+      "category": "logic",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "5",
+      "correct_answer": "5",
+      "gap_type": null
+    },
+    {
+      "id": "loan_payment",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "1100",
+      "correct_answer": "1100",
+      "gap_type": null
+    },
+    {
+      "id": "tip_split",
+      "category": "financial",
+      "understands": true,
+      "executes_correctly": true,
+      "extracted_answer": "36",
+      "correct_answer": "36",
+      "gap_type": null
+    },
+    {
+      "id": "profit_margin",
+      "category": "financial",
+      "understands": false,
+      "executes_correctly": true,
+      "extracted_answer": "1000",
+      "correct_answer": "1000",
+      "gap_type": "DOES_BUT_DOESNT_KNOW"
+    }
+  ]
+}
